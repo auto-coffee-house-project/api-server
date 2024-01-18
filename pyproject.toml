@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "coffee-house-api-server"
+version = "1.0.0"
+description = ""
+authors = ["Eldos <eldos.baktybekov@gmail.com>"]
+readme = "README.md"
+packages = [{include = "coffee_house_api_server"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.0.1"
+djangorestframework = "^3.14.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
