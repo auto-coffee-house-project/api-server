@@ -10,6 +10,7 @@ packages = [{include = "coffee_house_api_server"}]
 python = "^3.11"
 django = "^5.0.1"
 djangorestframework = "^3.14.0"
+django-environ = "^0.11.2"
 
 
 [build-system]
