@@ -1,4 +1,5 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 
 from telegram.models import User
 
@@ -6,7 +7,7 @@ __all__ = ('UserAdmin',)
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(ImportExportModelAdmin):
     search_fields = (
         'id',
         'username',
