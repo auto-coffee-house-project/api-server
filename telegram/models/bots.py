@@ -4,6 +4,7 @@ __all__ = ('Bot',)
 
 
 class Bot(models.Model):
+    id = models.BigIntegerField(primary_key=True)
     token = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     start_text = models.TextField(max_length=4096, blank=True, null=True)
