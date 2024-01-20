@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from telegram.forms import BotAdminForm
 from telegram.models import Bot
 
 __all__ = ('BotAdmin',)
@@ -7,4 +8,5 @@ __all__ = ('BotAdmin',)
 
 @admin.register(Bot)
 class BotAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ('id',)
+    form = BotAdminForm
