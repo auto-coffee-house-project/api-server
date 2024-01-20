@@ -1,7 +1,7 @@
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 
 from telegram.models import User
-from telegram.serializers.users import UserSerializer
+from telegram.serializers import UserSerializer
 
 __all__ = (
     'UserCreateApi',
