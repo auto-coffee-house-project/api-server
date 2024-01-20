@@ -7,7 +7,7 @@ __all__ = ('ShopGroup',)
 
 class ShopGroup(models.Model):
     name = models.CharField(max_length=255)
-    bot = models.ForeignKey(
+    bot = models.OneToOneField(
         to=Bot,
         on_delete=models.SET_NULL,
         null=True,
