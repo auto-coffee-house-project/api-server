@@ -11,7 +11,7 @@ class ShopSalesman(models.Model):
         to=User,
         on_delete=models.CASCADE,
     )
-    shop = models.ForeignKey(
+    shop = models.OneToOneField(
         to=Shop,
         on_delete=models.CASCADE,
     )
