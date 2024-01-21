@@ -1,2 +1,4 @@
+from .sale_temporary_codes import *
 from .shop_clients import *
 from .shop_groups import *
+from .shop_salesmans import *
