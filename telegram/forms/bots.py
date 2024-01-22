@@ -3,7 +3,8 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
 from telegram.exceptions import TelegramBotApiError
-from telegram.services.bots import get_telegram_bot_id
+from telegram.models import Bot
+from telegram.services.bots import get_telegram_bot
 
 __all__ = ('BotAdminForm',)
 
@@ -12,12 +13,13 @@ class BotAdminForm(forms.ModelForm):
     """Automatically get bot id from Telegram Bot API."""
 
     def clean(self):
+        self.instance: Bot
         super().clean()
 
         token = self.cleaned_data['token']
 
         try:
-            bot_id = get_telegram_bot_id(token)
+            bot = get_telegram_bot(token)
         except TelegramBotApiError as error:
             raise ValidationError(
                 _('Bot token error: %(error_description)s'),
@@ -25,4 +27,6 @@ class BotAdminForm(forms.ModelForm):
                 params={'error_description': error.description},
             )
 
-        self.instance.id = bot_id
+        self.instance.id = bot['id']
+        self.instance.name = bot['first_name']
+        self.instance.username = bot['username']

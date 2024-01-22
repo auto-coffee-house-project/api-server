@@ -1,14 +1,20 @@
 import contextlib
 from collections.abc import Generator
-from typing import NewType
+from typing import NewType, TypedDict
 
 import httpx
 
 from telegram.exceptions import TelegramBotApiError
 
-__all__ = ('get_telegram_bot_id',)
+__all__ = ('get_telegram_bot',)
 
 TelegramApiHttpClient = NewType('HttpClient', httpx.Client)
+
+
+class Bot(TypedDict):
+    id: int
+    first_name: str
+    username: str
 
 
 @contextlib.contextmanager
@@ -31,7 +37,7 @@ class TelegramBotApiConnection:
         return response.json()
 
 
-def get_telegram_bot_id(token: str) -> int:
+def get_telegram_bot(token: str) -> Bot:
     with closing_telegram_bot_api_http_client(token) as http_client:
         telegram_bot_api_connection = TelegramBotApiConnection(http_client)
         me = telegram_bot_api_connection.get_me()
@@ -40,4 +46,4 @@ def get_telegram_bot_id(token: str) -> int:
         error_description = me.get('description', 'Unknown error')
         raise TelegramBotApiError(error_description)
 
-    return me['result']['id']
+    return me['result']
