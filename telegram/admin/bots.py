@@ -8,5 +8,5 @@ __all__ = ('BotAdmin',)
 
 @admin.register(Bot)
 class BotAdmin(admin.ModelAdmin):
-    readonly_fields = ('id',)
+    readonly_fields = ('id', 'name', 'username')
     form = BotAdminForm
