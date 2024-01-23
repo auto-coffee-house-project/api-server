@@ -1,6 +1,10 @@
+from core.exceptions import ObjectDoesNotExistError
 from shops.models import ShopSale, Shop
 
-__all__ = ('count_client_purchases_in_shop_group',)
+__all__ = (
+    'count_client_purchases_in_shop_group',
+    'get_shop_sale_by_id',
+)
 
 
 def count_client_purchases_in_shop_group(
@@ -14,3 +18,10 @@ def count_client_purchases_in_shop_group(
         shop__in=shops,
     )
     return sales.count()
+
+
+def get_shop_sale_by_id(sale_id: int) -> ShopSale:
+    try:
+        return ShopSale.objects.get(id=sale_id)
+    except ShopSale.DoesNotExist:
+        raise ObjectDoesNotExistError({'sale_id': sale_id})
