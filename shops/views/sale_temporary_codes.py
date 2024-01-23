@@ -38,4 +38,5 @@ class SaleTemporaryCodeCreateApi(APIView):
         )
 
         serializer = self.OutputSerializer(sale_temporary_code)
-        return Response(serializer.data)
+        response_data = {'ok': True, 'result': serializer.data}
+        return Response(response_data)
