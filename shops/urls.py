@@ -5,6 +5,7 @@ from shops.views import (
     SaleTemporaryCodeCreateApi,
     ShopSalesmanRetrieveApi,
     ShopSaleDeleteApi,
+    ShopGroupRetrieveApi,
 )
 
 urlpatterns = [
@@ -16,8 +17,13 @@ urlpatterns = [
         name='sale-temporary-code-create',
     ),
     path(
-        r'salesmans/<int:salesman_id>/',
+        r'salesmans/<int:user_id>/',
         ShopSalesmanRetrieveApi.as_view(),
         name='salesman-retrieve',
+    ),
+    path(
+        r'groups/bots/<int:bot_id>/',
+        ShopGroupRetrieveApi.as_view(),
+        name='group-retrieve',
     ),
 ]
