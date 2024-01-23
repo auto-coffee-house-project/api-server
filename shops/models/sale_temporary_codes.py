@@ -4,6 +4,7 @@ from datetime import timedelta, datetime
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from shops.models.shop_clients import ShopClient
 from shops.models.shop_groups import ShopGroup
@@ -35,3 +36,7 @@ class SaleTemporaryCode(models.Model):
         return self.created_at + timedelta(
             seconds=settings.SALE_TEMPORARY_CODE_LIFETIME_SECONDS,
         )
+
+    @property
+    def is_expired(self) -> bool:
+        return self.expires_at < timezone.now()
