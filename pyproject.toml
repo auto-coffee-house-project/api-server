@@ -4,17 +4,18 @@ version = "1.0.0"
 description = ""
 authors = ["Eldos <eldos.baktybekov@gmail.com>"]
 readme = "README.md"
-packages = [{include = "coffee_house_api_server"}]
+packages = [{ include = "coffee_house_api_server" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-django = "^5.0.1"
+django = "^4.2.9"
 djangorestframework = "^3.14.0"
 django-environ = "^0.11.2"
 django-import-export = "^3.3.6"
 httpx = "^0.26.0"
 django-cors-headers = "^4.3.1"
 celery = "^5.3.6"
+django-celery-beat = "^2.5.0"
 
 
 [tool.poetry.group.dev.dependencies]
