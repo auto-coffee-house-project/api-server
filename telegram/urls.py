@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from telegram.views import UserCreateUpdateApi, UserRetrieveApi, BotListApi
+from telegram.views import UserCreateUpdateApi, BotListApi
 
 app_name = 'telegram'
 
@@ -17,11 +17,6 @@ users_urlpatterns = [
         r'',
         UserCreateUpdateApi.as_view(),
         name='user-create',
-    ),
-    path(
-        r'<int:user_id>/',
-        UserRetrieveApi.as_view(),
-        name='user-retrieve',
     ),
 ]
 

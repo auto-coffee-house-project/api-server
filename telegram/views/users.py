@@ -1,17 +1,11 @@
 from rest_framework import serializers, status
-from rest_framework.generics import RetrieveAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from telegram.models import User
-from telegram.serializers import UserSerializer
 from telegram.services.users import upsert_user
 
-__all__ = (
-    'UserCreateUpdateApi',
-    'UserRetrieveApi',
-)
+__all__ = ('UserCreateUpdateApi',)
 
 
 class UserCreateUpdateApi(APIView):
@@ -48,9 +42,3 @@ class UserCreateUpdateApi(APIView):
         )
         response_data = {'ok': True, 'result': serializer.data}
         return Response(response_data, status=status_code)
-
-
-class UserRetrieveApi(RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    lookup_url_kwarg = 'user_id'
