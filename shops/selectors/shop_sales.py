@@ -5,8 +5,8 @@ __all__ = ('count_client_purchases_in_shop_group',)
 
 def count_client_purchases_in_shop_group(
         *,
-        client_id: int,
-        shop_group_id: int,
+        client_id: int | type[int],
+        shop_group_id: int | type[int],
 ) -> int:
     shops = Shop.objects.filter(group_id=shop_group_id)
     sales = ShopSale.objects.filter(
