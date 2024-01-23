@@ -31,6 +31,9 @@ class SaleTemporaryCode(models.Model):
     class Meta:
         unique_together = ('client', 'group', 'code')
 
+    def __str__(self) -> str:
+        return self.code
+
     @property
     def expires_at(self) -> datetime:
         return self.created_at + timedelta(
