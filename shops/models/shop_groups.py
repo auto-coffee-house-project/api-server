@@ -13,6 +13,7 @@ class ShopGroup(models.Model):
         null=True,
         blank=True
     )
+    each_nth_cup_free = models.PositiveSmallIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
