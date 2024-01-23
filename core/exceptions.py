@@ -1,3 +1,7 @@
+class ApplicationError(Exception):
+    pass
+
+
 class ObjectDoesNotExistError(Exception):
     """Raised when the object does not exist in the DB."""
 

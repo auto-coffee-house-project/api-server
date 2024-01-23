@@ -101,6 +101,7 @@ REST_FRAMEWORK = {
         'rest_framework.pagination.LimitOffsetPagination'
     ),
     'PAGE_SIZE': 100,
+    'EXCEPTION_HANDLER': 'core.views.exception_handler',
 }
 
 SALE_TEMPORARY_CODE_LIFETIME_SECONDS = 120
