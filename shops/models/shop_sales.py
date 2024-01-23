@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from django.conf import settings
 from django.db import models
 
 from shops.models.shop_clients import ShopClient
@@ -25,3 +28,7 @@ class ShopSale(models.Model):
     )
     comment = models.TextField(max_length=4096, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def can_be_deleted_until(self) -> datetime:
+        return self.created_at + settings.SALE_CAN_BE_DELETED_IN_SECONDS
