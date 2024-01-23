@@ -16,6 +16,15 @@ httpx = "^0.26.0"
 django-cors-headers = "^4.3.1"
 
 
+[tool.poetry.group.dev.dependencies]
+pytest-django = "^4.7.0"
+factory-boy = "^3.3.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "coffee_house.settings"
+python_files = ["test_*.py", "*_test.py", "testing/python/*.py"]
