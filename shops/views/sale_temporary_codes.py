@@ -1,10 +1,8 @@
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.exceptions import ObjectDoesNotExistError
 from shops.selectors import get_shop_client_by_user_id, get_shop_group_by_bot_id
 from shops.services.sale_temporary_codes import create_sale_temporary_code
 
@@ -31,15 +29,8 @@ class SaleTemporaryCodeCreateApi(APIView):
         client_user_id: int = serialized_data['client_user_id']
         bot_id: int = serialized_data['bot_id']
 
-        try:
-            shop_client = get_shop_client_by_user_id(client_user_id)
-        except ObjectDoesNotExistError as error:
-            raise NotFound(error.message)
-
-        try:
-            shop_group = get_shop_group_by_bot_id(bot_id)
-        except ObjectDoesNotExistError as error:
-            raise NotFound(error.message)
+        shop_client = get_shop_client_by_user_id(client_user_id)
+        shop_group = get_shop_group_by_bot_id(bot_id)
 
         sale_temporary_code = create_sale_temporary_code(
             shop_client_id=shop_client.id,

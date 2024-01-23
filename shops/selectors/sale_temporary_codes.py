@@ -17,10 +17,7 @@ def get_sale_temporary_code(code: str) -> SaleTemporaryCode:
     try:
         return SaleTemporaryCode.objects.get(code=code)
     except SaleTemporaryCode.DoesNotExist:
-        raise ObjectDoesNotExistError(
-            f'Sale temporary code by {code=} does not exist',
-            code=code,
-        )
+        raise ObjectDoesNotExistError({'code': code})
 
 
 def get_expired_sale_temporary_codes() -> QuerySet[SaleTemporaryCode]:

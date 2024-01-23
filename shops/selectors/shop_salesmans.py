@@ -12,7 +12,4 @@ def get_shop_salesman_by_user_id(user_id: int) -> ShopSalesman:
             .get(user_id=user_id)
         )
     except ShopSalesman.DoesNotExist:
-        raise ObjectDoesNotExistError(
-            f'Shop salesman by {user_id=} does not exist',
-            user_id=user_id,
-        )
+        raise ObjectDoesNotExistError({'user_id': user_id})

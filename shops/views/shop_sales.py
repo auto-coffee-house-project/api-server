@@ -5,7 +5,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.exceptions import ObjectDoesNotExistError
 from shops.models import ShopSale
 from shops.selectors import (
     get_sale_temporary_code,
@@ -34,15 +33,8 @@ class ShopSaleCreateApi(APIView):
         code: str = serialized_data['code']
         salesman_user_id: int = serialized_data['salesman_user_id']
 
-        try:
-            sale_temporary_code = get_sale_temporary_code(code)
-        except ObjectDoesNotExistError as error:
-            raise NotFound(error.message)
-
-        try:
-            salesman = get_shop_salesman_by_user_id(salesman_user_id)
-        except ObjectDoesNotExistError as error:
-            raise NotFound(error.message)
+        sale_temporary_code = get_sale_temporary_code(code)
+        salesman = get_shop_salesman_by_user_id(salesman_user_id)
 
         if salesman.shop.group_id != sale_temporary_code.group_id:
             error = APIException(
