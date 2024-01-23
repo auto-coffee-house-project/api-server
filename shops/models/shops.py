@@ -11,4 +11,5 @@ class Shop(models.Model):
         to=ShopGroup,
         on_delete=models.CASCADE,
     )
+    each_nth_cup_free = models.PositiveSmallIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
