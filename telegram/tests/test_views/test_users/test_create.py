@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from telegram.views import UserCreateApi
+from telegram.views import UserCreateUpdateApi
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def url() -> str:
 
 @pytest.fixture
 def view() -> Callable[[Request], Response]:
-    return UserCreateApi.as_view()
+    return UserCreateUpdateApi.as_view()
 
 
 @pytest.mark.django_db
