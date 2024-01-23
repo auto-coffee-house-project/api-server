@@ -1,6 +1,7 @@
 import random
 import string
 from datetime import timedelta, datetime
+from uuid import uuid4
 
 from django.conf import settings
 from django.db import models
@@ -17,6 +18,7 @@ def generate_code() -> str:
 
 
 class SaleTemporaryCode(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     client = models.ForeignKey(
         to=ShopClient,
         on_delete=models.CASCADE,
