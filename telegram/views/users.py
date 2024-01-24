@@ -13,8 +13,8 @@ class UserCreateUpdateApi(APIView):
     class InputSerializer(serializers.Serializer):
         id = serializers.IntegerField()
         first_name = serializers.CharField()
-        last_name = serializers.CharField()
-        username = serializers.CharField()
+        last_name = serializers.CharField(allow_null=True)
+        username = serializers.CharField(allow_null=True)
 
     class OutputSerializer(serializers.Serializer):
         id = serializers.IntegerField()
