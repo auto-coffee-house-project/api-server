@@ -102,6 +102,9 @@ REST_FRAMEWORK = {
     ),
     'PAGE_SIZE': 100,
     'EXCEPTION_HANDLER': 'core.views.exception_handler',
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
 }
 
 SALE_TEMPORARY_CODE_LIFETIME_SECONDS = 120
