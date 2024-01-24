@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 from django.conf import settings
@@ -12,7 +12,7 @@ __all__ = ('SalesmanInvitation',)
 
 class SalesmanInvitation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    shop_id = models.ForeignKey(
+    shop = models.ForeignKey(
         to=Shop,
         on_delete=models.CASCADE,
     )
@@ -24,4 +24,6 @@ class SalesmanInvitation(models.Model):
 
     @property
     def expires_at(self) -> datetime:
-        return self.created_at + settings.SALESMAN_INVITATION_LIFETIME_SECONDS
+        return self.created_at + timedelta(
+            seconds=settings.SALESMAN_INVITATION_LIFETIME_SECONDS,
+        )
