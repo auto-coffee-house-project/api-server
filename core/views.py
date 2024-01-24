@@ -34,8 +34,9 @@ def exception_handler(exc, context) -> Response | None:
     if not is_response_exists:
         if is_application_error:
             data = {
-                'message': context.message,
-                'extra': context.extra
+                'message': exc.default_code,
+                'extra': context.extra,
+                'ok': False,
             }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
         return response
@@ -48,9 +49,10 @@ def exception_handler(exc, context) -> Response | None:
         response.data['extra'] = response.data.pop('detail', None)
     elif isinstance(exc, drf_exceptions.ValidationError):
         response.data['message'] = 'Validation error'
-        response.data['extra'] = {'fields': response.data.pop('detail')}
+        response.data['extra'] = {'fields': response.data.pop('detail', None)}
     else:
-        response.data['message'] = response.data.pop('detail')
-        response.data['extra'] = {}
+        response.data['message'] = exc.default_code
+        response.data['extra'] = response.data.pop('detail', None)
 
+    response.data['ok'] = False
     return response
