@@ -6,7 +6,7 @@ from shops.views import (
     ShopSalesmanRetrieveApi,
     ShopSaleDeleteApi,
     ShopGroupRetrieveApi,
-    SalesmanInvitationCreateApi,
+    SalesmanInvitationCreateApi, ShopAdminRetrieveApi,
 )
 
 urlpatterns = [
@@ -31,5 +31,10 @@ urlpatterns = [
         r'invitations/',
         SalesmanInvitationCreateApi.as_view(),
         name='invitation-create',
-    )
+    ),
+    path(
+        r'admins/<int:user_id>/',
+        ShopAdminRetrieveApi.as_view(),
+        name='admin-retrieve',
+    ),
 ]
