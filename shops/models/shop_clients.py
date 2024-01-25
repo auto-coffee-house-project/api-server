@@ -11,3 +11,10 @@ class ShopClient(models.Model):
         on_delete=models.CASCADE,
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'client'
+        verbose_name_plural = 'clients'
+
+    def __str__(self) -> str:
+        return str(self.user)

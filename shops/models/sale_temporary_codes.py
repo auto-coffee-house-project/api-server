@@ -31,6 +31,8 @@ class SaleTemporaryCode(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        verbose_name = 'code'
+        verbose_name_plural = 'codes'
         unique_together = ('client', 'group', 'code')
 
     def __str__(self) -> str:

@@ -13,3 +13,7 @@ class Subscription(models.Model):
     starts_at = models.DateField()
     ends_at = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'subscription'
+        verbose_name_plural = 'subscriptions'

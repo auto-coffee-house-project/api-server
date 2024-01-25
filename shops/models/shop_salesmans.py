@@ -16,3 +16,10 @@ class ShopSalesman(models.Model):
         on_delete=models.CASCADE,
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'salesman'
+        verbose_name_plural = 'salesmans'
+
+    def __str__(self) -> str:
+        return str(self.user)

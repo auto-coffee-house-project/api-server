@@ -16,5 +16,9 @@ class ShopGroup(models.Model):
     each_nth_cup_free = models.PositiveSmallIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'group'
+        verbose_name_plural = 'groups'
+
     def __str__(self) -> str:
         return self.name

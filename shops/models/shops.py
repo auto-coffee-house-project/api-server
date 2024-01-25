@@ -13,5 +13,9 @@ class Shop(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'shop'
+        verbose_name_plural = 'shops'
+
     def __str__(self) -> str:
         return self.name

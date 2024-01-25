@@ -29,6 +29,10 @@ class ShopSale(models.Model):
     comment = models.TextField(max_length=4096, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'sale'
+        verbose_name_plural = 'sales'
+
     @property
     def can_be_deleted_until(self) -> datetime:
         return self.created_at + timedelta(

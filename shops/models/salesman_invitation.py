@@ -23,6 +23,11 @@ class SalesmanInvitation(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'invitation'
+        verbose_name_plural = 'invitations'
+
+
     @property
     def expires_at(self) -> datetime:
         return self.created_at + timedelta(
