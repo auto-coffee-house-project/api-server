@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from shops.models.shop_admins import ShopAdmin
 from shops.models.shops import Shop
@@ -27,3 +28,7 @@ class SalesmanInvitation(models.Model):
         return self.created_at + timedelta(
             seconds=settings.SALESMAN_INVITATION_LIFETIME_SECONDS,
         )
+
+    @property
+    def is_expired(self) -> bool:
+        return self.expires_at < timezone.now()
