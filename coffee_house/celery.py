@@ -2,7 +2,7 @@ import os
 
 from celery import Celery
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vobla_vpn.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'coffee_house.settings')
 
 app = Celery('coffee_house')
 
