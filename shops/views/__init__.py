@@ -1,3 +1,4 @@
+from .mailings import *
 from .sale_temporary_codes import *
 from .salesman_invitations import *
 from .shop_admins import *

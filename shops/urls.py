@@ -1,26 +1,46 @@
-from django.urls import path
+from django.urls import path, include
 
 from shops.views import (
     ShopSaleCreateApi,
     SaleTemporaryCodeCreateApi,
-    ShopSalesmanRetrieveApi,
+    ShopSalesmanRetrieveDeleteApi,
     ShopSaleDeleteApi,
     ShopGroupRetrieveApi,
-    SalesmanInvitationCreateApi, ShopAdminRetrieveApi,
+    SalesmanInvitationCreateApi,
+    ShopAdminRetrieveApi,
+    MailingCreateApi,
+    ShopSalesmanCreateApi,
 )
 
-urlpatterns = [
+salesmans_urlpatterns = [
+    path(
+        r'salesmans/<int:user_id>/',
+        ShopSalesmanRetrieveDeleteApi.as_view(),
+        name='salesman-retrieve',
+    ),
+    path(
+        r'salesmans/',
+        ShopSalesmanCreateApi.as_view(),
+        name='salesman-create',
+    )
+]
+
+sales_urlpatterns = [
     path(r'sales/', ShopSaleCreateApi.as_view(), name='sale-create'),
-    path(r'sales/', ShopSaleDeleteApi.as_view(), name='sale-delete'),
+    path(
+        r'sales/<int:sale_id>/',
+        ShopSaleDeleteApi.as_view(),
+        name='sale-delete',
+    ),
+]
+
+urlpatterns = [
+    path(r'salesmans/', include(salesmans_urlpatterns)),
+    path(r'sales/', include(sales_urlpatterns)),
     path(
         r'codes/',
         SaleTemporaryCodeCreateApi.as_view(),
         name='sale-temporary-code-create',
-    ),
-    path(
-        r'salesmans/<int:user_id>/',
-        ShopSalesmanRetrieveApi.as_view(),
-        name='salesman-retrieve',
     ),
     path(
         r'groups/bots/<int:bot_id>/',
@@ -36,5 +56,10 @@ urlpatterns = [
         r'admins/<int:user_id>/',
         ShopAdminRetrieveApi.as_view(),
         name='admin-retrieve',
+    ),
+    path(
+        r'mailings/',
+        MailingCreateApi.as_view(),
+        name='mailing-create',
     ),
 ]
