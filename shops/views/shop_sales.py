@@ -45,8 +45,8 @@ class ShopSaleCreateApi(APIView):
 
 class ShopSaleDeleteApi(APIView):
 
-    def delete(self, request: Request, shop_sale_id: int) -> Response:
-        shop_sale = get_shop_sale_by_id(shop_sale_id)
+    def delete(self, request: Request, sale_id: int) -> Response:
+        shop_sale = get_shop_sale_by_id(sale_id)
         delete_shop_sale(shop_sale)
         response_data = {'ok': True}
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
