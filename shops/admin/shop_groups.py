@@ -1,4 +1,5 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 
 from shops.models import ShopGroup, Shop
 
@@ -11,7 +12,7 @@ class ShopInline(admin.TabularInline):
 
 
 @admin.register(ShopGroup)
-class ShopGroupAdmin(admin.ModelAdmin):
+class ShopGroupAdmin(ImportExportModelAdmin):
     search_fields = ('name',)
     search_help_text = 'Name'
     list_display = ('name', 'bot', 'each_nth_cup_free', 'created_at')

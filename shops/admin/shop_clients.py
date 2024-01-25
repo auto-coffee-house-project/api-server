@@ -1,4 +1,5 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 
 from shops.models import ShopClient, ShopSale
 
@@ -13,7 +14,7 @@ class SaleInline(admin.TabularInline):
 
 
 @admin.register(ShopClient)
-class ShopClientAdmin(admin.ModelAdmin):
+class ShopClientAdmin(ImportExportModelAdmin):
     autocomplete_fields = ('user',)
     search_fields = ('user__id', 'user__name', 'user__username')
     search_help_text = 'User ID, name or username'

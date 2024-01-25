@@ -1,4 +1,5 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 
 from shops.models import ShopAdmin
 
@@ -6,7 +7,7 @@ __all__ = ('ShopAdminAdmin',)
 
 
 @admin.register(ShopAdmin)
-class ShopAdminAdmin(admin.ModelAdmin):
+class ShopAdminAdmin(ImportExportModelAdmin):
     autocomplete_fields = ('user', 'shop')
     search_fields = ('user__id', 'user__name', 'user__username')
     search_help_text = 'User ID, name or username'
