@@ -17,8 +17,8 @@ class ShopGroup(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'group'
-        verbose_name_plural = 'groups'
+        verbose_name = 'shop group'
+        verbose_name_plural = 'shop groups'
 
     def __str__(self) -> str:
         return self.name

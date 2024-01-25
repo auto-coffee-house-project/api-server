@@ -7,4 +7,8 @@ __all__ = ('ShopAdmin',)
 
 @admin.register(Shop)
 class ShopAdmin(admin.ModelAdmin):
-    pass
+    autocomplete_fields = ('group',)
+    search_help_text = 'Name or group name'
+    search_fields = ('name', 'group')
+    list_display = ('name', 'group', 'created_at')
+    list_select_related = ('group',)
