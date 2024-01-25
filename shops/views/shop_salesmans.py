@@ -12,12 +12,12 @@ from shops.selectors import (
 from shops.services.shop_salesmans import create_salesman_by_invitation
 
 __all__ = (
-    'ShopSalesmanRetrieveApi',
+    'ShopSalesmanRetrieveDeleteApi',
     'ShopSalesmanCreateApi',
 )
 
 
-class ShopSalesmanRetrieveApi(APIView):
+class ShopSalesmanRetrieveDeleteApi(APIView):
 
     class OutputSerializer(serializers.Serializer):
         id = serializers.IntegerField()
@@ -27,6 +27,12 @@ class ShopSalesmanRetrieveApi(APIView):
         salesman = get_shop_salesman_by_user_id(user_id)
         serializer = self.OutputSerializer(salesman)
         response_data = {'ok': True, 'result': serializer.data}
+        return Response(response_data)
+
+    def delete(self, request: Request, user_id: int) -> Response:
+        salesman = get_shop_salesman_by_user_id(user_id)
+        salesman.delete()
+        response_data = {'ok': True}
         return Response(response_data)
 
 
