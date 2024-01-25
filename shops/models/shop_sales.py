@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db import models
@@ -31,4 +31,6 @@ class ShopSale(models.Model):
 
     @property
     def can_be_deleted_until(self) -> datetime:
-        return self.created_at + settings.SALE_CAN_BE_DELETED_IN_SECONDS
+        return self.created_at + timedelta(
+            seconds=settings.SALE_CAN_BE_DELETED_IN_SECONDS,
+        )
