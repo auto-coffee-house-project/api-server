@@ -9,19 +9,19 @@ from shops.views import (
     SalesmanInvitationCreateApi,
     ShopAdminRetrieveApi,
     MailingCreateApi,
-    ShopSalesmanCreateApi,
+    ShopSalesmanListCreateApi,
 )
 
 salesmans_urlpatterns = [
     path(
-        r'salesmans/<int:user_id>/',
+        r'<int:user_id>/',
         ShopSalesmanRetrieveDeleteApi.as_view(),
-        name='salesman-retrieve',
+        name='salesman-retrieve-delete',
     ),
     path(
-        r'salesmans/',
-        ShopSalesmanCreateApi.as_view(),
-        name='salesman-create',
+        r'',
+        ShopSalesmanListCreateApi.as_view(),
+        name='salesman-list-create',
     )
 ]
 

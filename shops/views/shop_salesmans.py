@@ -8,12 +8,13 @@ from rest_framework.views import APIView
 from shops.selectors import (
     get_shop_salesman_by_user_id,
     get_salesman_invitation_by_id,
+    get_shop_admin_by_user_id,
 )
 from shops.services.shop_salesmans import create_salesman_by_invitation
 
 __all__ = (
     'ShopSalesmanRetrieveDeleteApi',
-    'ShopSalesmanCreateApi',
+    'ShopSalesmanListCreateApi',
 )
 
 
@@ -36,18 +37,48 @@ class ShopSalesmanRetrieveDeleteApi(APIView):
         return Response(response_data)
 
 
-class ShopSalesmanCreateApi(APIView):
+class ShopSalesmanListCreateApi(APIView):
 
-    class InputSerializer(serializers.Serializer):
-        user_id = serializers.IntegerField()
-        invitation_id = serializers.UUIDField()
+    class InputListSerializer(serializers.Serializer):
+        admin_user_id = serializers.IntegerField()
 
-    class OutputSerializer(serializers.Serializer):
+    class OutputListSerializer(serializers.Serializer):
+
+        class SalesmanSerializer(serializers.Serializer):
+            id = serializers.IntegerField()
+            user_id = serializers.IntegerField(source='user.id')
+            user_first_name = serializers.CharField(source='user.first_name')
+            user_last_name = serializers.CharField(source='user.last_name')
+            user_username = serializers.CharField(source='user.username')
+
+        salesmans = SalesmanSerializer(many=True, source='shop.shopsalesman_set')
         shop_name = serializers.CharField(source='shop.name')
         shop_group_name = serializers.CharField(source='shop.group.name')
 
+    class InputCreateSerializer(serializers.Serializer):
+        user_id = serializers.IntegerField()
+        invitation_id = serializers.UUIDField()
+
+    class OutputCreateSerializer(serializers.Serializer):
+        shop_name = serializers.CharField(source='shop.name')
+        shop_group_name = serializers.CharField(source='shop.group.name')
+
+    def get(self, request: Request) -> Response:
+        serializer = self.InputListSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        serialized_data = serializer.data
+
+        admin_user_id: int = serialized_data['admin_user_id']
+
+        shop_admin = get_shop_admin_by_user_id(admin_user_id)
+
+        serializer = self.OutputListSerializer(shop_admin)
+
+        response_data = {'ok': True, 'result': serializer.data}
+        return Response(response_data)
+
     def post(self, request: Request) -> Response:
-        serializer = self.InputSerializer(data=request.data)
+        serializer = self.InputCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serialized_data = serializer.data
 
@@ -60,6 +91,6 @@ class ShopSalesmanCreateApi(APIView):
             invitation=invitation,
         )
 
-        serializer = self.OutputSerializer(invitation)
+        serializer = self.OutputCreateSerializer(invitation)
         response_data = {'ok': True, 'result': serializer.data}
         return Response(response_data)
