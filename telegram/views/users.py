@@ -3,6 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from shops.services.shop_clients import get_or_create_shop_client
 from telegram.models import User
 from telegram.selectors import get_user_role
 from telegram.services.users import upsert_user
@@ -53,6 +54,7 @@ class UserCreateUpdateApi(APIView):
             last_name=serialized_data['last_name'],
             username=serialized_data['username'],
         )
+        get_or_create_shop_client(user.id)
         role = get_user_role(user.id)
 
         serializer = self.OutputSerializer(user)
