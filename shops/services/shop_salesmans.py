@@ -1,9 +1,16 @@
-from shops.exceptions import InvitationExpiredError
+from django.db import transaction
+
+from shops.exceptions import (
+    InvitationExpiredError,
+    ShopSalesmanAlreadyExistsError,
+)
 from shops.models import ShopSalesman, SalesmanInvitation
+from shops.selectors import is_salesman
 
 __all__ = ('create_salesman_by_invitation',)
 
 
+@transaction.atomic
 def create_salesman_by_invitation(
         *,
         user_id: int,
@@ -24,6 +31,11 @@ def create_salesman_by_invitation(
     """
     if invitation.is_expired:
         raise InvitationExpiredError({'invitation_id': invitation.id})
+
+    if is_salesman(user_id):
+        raise ShopSalesmanAlreadyExistsError({'user_id': user_id})
+
+    invitation.delete()
 
     return ShopSalesman.objects.create(
         shop_id=invitation.shop_id,
