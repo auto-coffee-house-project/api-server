@@ -27,9 +27,9 @@ salesmans_urlpatterns = [
 ]
 
 sales_urlpatterns = [
-    path(r'sales/', ShopSaleCreateApi.as_view(), name='sale-create'),
+    path(r'', ShopSaleCreateApi.as_view(), name='sale-create'),
     path(
-        r'sales/<int:sale_id>/',
+        r'<int:sale_id>/',
         ShopSaleDeleteApi.as_view(),
         name='sale-delete',
     ),
