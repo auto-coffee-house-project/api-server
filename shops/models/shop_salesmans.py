@@ -20,6 +20,7 @@ class ShopSalesman(models.Model):
     class Meta:
         verbose_name = 'salesman'
         verbose_name_plural = 'salesmans'
+        unique_together = ('user', 'shop')
 
     def __str__(self) -> str:
         return str(self.user)

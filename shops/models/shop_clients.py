@@ -6,7 +6,7 @@ __all__ = ('ShopClient',)
 
 
 class ShopClient(models.Model):
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         to=User,
         on_delete=models.CASCADE,
     )
