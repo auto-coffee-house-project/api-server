@@ -48,8 +48,8 @@ class ShopSalesmanListCreateApi(APIView):
             id = serializers.IntegerField()
             user_id = serializers.IntegerField(source='user.id')
             user_first_name = serializers.CharField(source='user.first_name')
-            user_last_name = serializers.CharField(source='user.last_name')
-            user_username = serializers.CharField(source='user.username')
+            user_last_name = serializers.CharField(source='user.last_name', allow_null=True)
+            user_username = serializers.CharField(source='user.username', allow_null=True)
 
         salesmans = SalesmanSerializer(many=True, source='shop.shopsalesman_set')
         shop_name = serializers.CharField(source='shop.name')
