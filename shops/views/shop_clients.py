@@ -5,9 +5,9 @@ from rest_framework.views import APIView
 
 from shops.selectors import (
     get_shop_client_by_user_id,
-    get_shop_admin_by_user_id,
-    count_client_purchases_in_shop_group, get_shop_group_by_bot_id,
+    get_shop_group_by_bot_id,
 )
+from shops.services.shop_clients import get_shop_client_statistics
 
 __all__ = ('ShopClientStatisticsRetrieveApi',)
 
@@ -17,6 +17,13 @@ class ShopClientStatisticsRetrieveApi(APIView):
     class InputSerializer(serializers.Serializer):
         user_id = serializers.IntegerField()
         bot_id = serializers.IntegerField()
+
+    class OutputSerializer(serializers.Serializer):
+        user_id = serializers.IntegerField()
+        shop_group_bot_id = serializers.IntegerField()
+        each_nth_cup_free = serializers.IntegerField()
+        purchases_count = serializers.IntegerField()
+        current_cups_count = serializers.IntegerField()
 
     def get(self, request: Request) -> Response:
         serializer = self.InputSerializer(data=request.query_params)
@@ -29,19 +36,12 @@ class ShopClientStatisticsRetrieveApi(APIView):
         shop_client = get_shop_client_by_user_id(user_id)
         shop_group = get_shop_group_by_bot_id(bot_id)
 
-        purchases_count = count_client_purchases_in_shop_group(
-            client_id=shop_client.id,
-            shop_group_id=shop_group.id,
+        shop_client_statistics = get_shop_client_statistics(
+            shop_client=shop_client,
+            shop_group=shop_group,
         )
-        current_cups_count = purchases_count % shop_group.each_nth_cup_free
 
-        response_data = {
-            'ok': True,
-            'result': {
-                'user_id': shop_client.user.id,
-                'purchases_count': purchases_count,
-                'each_nth_cup_free': shop_group.each_nth_cup_free,
-                'current_cups_count': current_cups_count,
-            },
-        }
+        serializer = self.OutputSerializer(shop_client_statistics)
+
+        response_data = {'ok': True, 'result': serializer.data}
         return Response(response_data)
