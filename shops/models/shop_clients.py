@@ -1,8 +1,19 @@
+from dataclasses import dataclass
+
 from django.db import models
 
 from telegram.models.users import User
 
-__all__ = ('ShopClient',)
+__all__ = ('ShopClient', 'ShopClientStatistics')
+
+
+@dataclass(frozen=True, slots=True)
+class ShopClientStatistics:
+    user_id: int
+    shop_group_bot_id: int
+    each_nth_cup_free: int
+    purchases_count: int
+    current_cups_count: int
 
 
 class ShopClient(models.Model):
