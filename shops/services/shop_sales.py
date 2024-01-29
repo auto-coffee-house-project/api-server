@@ -28,7 +28,9 @@ def is_shop_sale_free(
         client_id=client_id,
         shop_group_id=shop_group.id,
     )
-    return sales_count % shop_group.each_nth_cup_free == 0
+    has_any_purchase = sales_count != 0
+    current_cups_count = (sales_count + 1) % shop_group.each_nth_cup_free
+    return current_cups_count == 0 and has_any_purchase
 
 
 def create_shop_sale(
