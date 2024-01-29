@@ -1,5 +1,6 @@
-from shops.models import ShopClient, ShopGroup, ShopClientStatistics
+from django.db.models import Count, When, Case, IntegerField
 
+from shops.models import ShopClient, ShopGroup, ShopClientStatistics, ShopSale
 from shops.selectors import count_client_purchases_in_shop_group
 
 __all__ = ('get_or_create_shop_client', 'get_shop_client_statistics')
@@ -29,3 +30,34 @@ def get_shop_client_statistics(
         each_nth_cup_free=shop_group.each_nth_cup_free,
         current_cups_count=current_cups_count,
     )
+
+
+def get_shop_client_statistics_list(
+        bot_id: int,
+) -> list[dict]:
+    clients_statistics = (
+        ShopSale.objects
+        .filter(shop__group__bot_id=bot_id)
+        .values('client__user_id')
+        .annotate(
+            total_purchases_count=Count('id'),
+            free_purchases_count=Count(
+                Case(
+                    When(
+                        is_free=True,
+                        then=1,
+                    ),
+                    output_field=IntegerField(),
+                )
+            )
+        )
+        .order_by('-total_purchases_count', '-free_purchases_count')
+    )
+    return [
+        {
+            'user_id': client_statistics['client__user_id'],
+            'total_purchases_count': client_statistics['total_purchases_count'],
+            'free_purchases_count': client_statistics['free_purchases_count'],
+        }
+        for client_statistics in clients_statistics
+    ]

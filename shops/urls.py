@@ -10,7 +10,7 @@ from shops.views import (
     ShopAdminRetrieveApi,
     MailingCreateApi,
     ShopSalesmanListCreateApi,
-    ShopClientStatisticsRetrieveApi,
+    ShopClientStatisticsRetrieveApi, ShopClientStatisticsListApi,
 )
 
 salesmans_urlpatterns = [
@@ -41,6 +41,11 @@ clients_urlpatterns = [
         ShopClientStatisticsRetrieveApi.as_view(),
         name='client-statistics',
     ),
+    path(
+        r'all-statistics/',
+        ShopClientStatisticsListApi.as_view(),
+        name='all-clients-statistics',
+    )
 ]
 
 urlpatterns = [
