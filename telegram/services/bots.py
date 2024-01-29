@@ -58,8 +58,8 @@ def get_telegram_bot(token: str) -> Bot:
     return me['result']
 
 
-def send_messages(chat_ids: Iterable[int], text: str) -> None:
-    with closing_telegram_bot_api_http_client() as http_client:
+def send_messages(token: str, chat_ids: Iterable[int], text: str) -> None:
+    with closing_telegram_bot_api_http_client(token) as http_client:
         telegram_bot_api_connection = TelegramBotApiConnection(http_client)
 
         for chat_id in chat_ids:
