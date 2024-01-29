@@ -15,7 +15,11 @@ __all__ = (
 
 def get_sale_temporary_code(code: str) -> SaleTemporaryCode:
     try:
-        return SaleTemporaryCode.objects.get(code=code)
+        return (
+            SaleTemporaryCode.objects
+            .select_related('client', 'client__user', 'group', 'group__bot')
+            .get(code=code)
+        )
     except SaleTemporaryCode.DoesNotExist:
         raise ObjectDoesNotExistError({'code': code})
 
