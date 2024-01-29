@@ -8,6 +8,7 @@ from shops.selectors import (
     get_shop_salesman_by_user_id,
     get_shop_sale_by_id,
 )
+from shops.services.shop_clients import get_shop_client_statistics
 from shops.services.shop_sales import delete_shop_sale, create_shop_sale
 
 __all__ = ('ShopSaleCreateApi', 'ShopSaleDeleteApi')
@@ -22,6 +23,7 @@ class ShopSaleCreateApi(APIView):
     class OutputSerializer(serializers.Serializer):
         id = serializers.IntegerField()
         is_free = serializers.BooleanField()
+        client_user_id = serializers.IntegerField(source='client.user_id')
 
     def post(self, request: Request) -> Response:
         serializer = self.InputSerializer(data=request.data)
@@ -38,8 +40,21 @@ class ShopSaleCreateApi(APIView):
             sale_temporary_code=sale_temporary_code,
         )
 
+        shop_client_statistics = get_shop_client_statistics(
+            shop_client=sale_temporary_code.client,
+            shop_group=sale_temporary_code.group,
+        )
+
         serializer = self.OutputSerializer(shop_sale)
-        response_data = {'ok': True, 'result': serializer.data}
+        response_data = {
+            'ok': True,
+            'result': serializer.data | {
+                'shop_group_bot_id': shop_client_statistics.shop_group_bot_id,
+                'each_nth_cup_free': shop_client_statistics.each_nth_cup_free,
+                'purchases_count': shop_client_statistics.purchases_count,
+                'current_cups_count': shop_client_statistics.current_cups_count,
+            },
+        }
         return Response(response_data)
 
 
