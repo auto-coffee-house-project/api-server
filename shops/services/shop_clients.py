@@ -37,8 +37,9 @@ def get_shop_client_statistics_list(
 ) -> list[dict]:
     clients_statistics = (
         ShopSale.objects
+        .select_related('client__user')
         .filter(shop__group__bot_id=bot_id)
-        .values('client__user_id')
+        .values('client__user_id', 'client__user__first_name', 'client__user__last_name', 'client__user__username')
         .annotate(
             total_purchases_count=Count('id'),
             free_purchases_count=Count(
@@ -55,7 +56,12 @@ def get_shop_client_statistics_list(
     )
     return [
         {
-            'user_id': client_statistics['client__user_id'],
+            'user': {
+                'id': client_statistics['client__user_id'],
+                'first_name': client_statistics['client__user__first_name'],
+                'last_name': client_statistics['client__user__last_name'],
+                'username': client_statistics['client__user__username'],
+            },
             'total_purchases_count': client_statistics['total_purchases_count'],
             'free_purchases_count': client_statistics['free_purchases_count'],
         }
