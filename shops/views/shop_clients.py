@@ -56,7 +56,13 @@ class ShopClientStatisticsListApi(APIView):
         bot_id = serializers.IntegerField()
 
     class OutputSerializer(serializers.Serializer):
-        user_id = serializers.IntegerField()
+        class UserSerializer(serializers.Serializer):
+            id = serializers.IntegerField()
+            first_name = serializers.CharField()
+            last_name = serializers.CharField(allow_null=True)
+            username = serializers.CharField(allow_null=True)
+
+        user = UserSerializer()
         shop_group_bot_id = serializers.IntegerField()
         each_nth_cup_free = serializers.IntegerField()
         purchases_count = serializers.IntegerField()
