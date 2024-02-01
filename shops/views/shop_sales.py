@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 
 from shops.selectors import (
     get_sale_temporary_code,
-    get_shop_salesman_by_user_id,
     get_shop_sale_by_id,
+    get_shop_salesman,
 )
 from shops.services.shop_clients import get_shop_client_statistics
 from shops.services.shop_sales import delete_shop_sale, create_shop_sale
@@ -34,7 +34,10 @@ class ShopSaleCreateApi(APIView):
         salesman_user_id: int = serialized_data['salesman_user_id']
 
         sale_temporary_code = get_sale_temporary_code(code)
-        salesman = get_shop_salesman_by_user_id(salesman_user_id)
+        salesman = get_shop_salesman(
+            user_id=salesman_user_id,
+            shop_group_id=sale_temporary_code.group_id,
+        )
         shop_sale = create_shop_sale(
             salesman=salesman,
             sale_temporary_code=sale_temporary_code,
