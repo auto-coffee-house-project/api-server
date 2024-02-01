@@ -5,7 +5,7 @@ from shops.exceptions import (
     ShopSalesmanAlreadyExistsError,
 )
 from shops.models import ShopSalesman, SalesmanInvitation
-from shops.selectors import is_salesman
+from shops.selectors import is_shop_salesman
 
 __all__ = ('create_salesman_by_invitation',)
 
@@ -32,7 +32,10 @@ def create_salesman_by_invitation(
     if invitation.is_expired:
         raise InvitationExpiredError({'invitation_id': invitation.id})
 
-    if is_salesman(user_id):
+    if is_shop_salesman(
+            user_id=user_id,
+            shop_group_id=invitation.shop.group_id,
+    ):
         raise ShopSalesmanAlreadyExistsError({'user_id': user_id})
 
     invitation.delete()
