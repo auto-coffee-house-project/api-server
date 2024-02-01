@@ -3,28 +3,15 @@ from django.urls import path, include
 from shops.views import (
     ShopSaleCreateApi,
     SaleTemporaryCodeCreateApi,
-    ShopSalesmanRetrieveDeleteApi,
     ShopSaleDeleteApi,
     ShopGroupRetrieveApi,
     SalesmanInvitationCreateApi,
     ShopAdminRetrieveApi,
     MailingCreateApi,
     ShopSalesmanListCreateApi,
-    ShopClientStatisticsRetrieveApi, ShopClientStatisticsListApi,
+    ShopClientStatisticsRetrieveApi,
+    ShopClientStatisticsListApi,
 )
-
-salesmans_urlpatterns = [
-    path(
-        r'<int:user_id>/',
-        ShopSalesmanRetrieveDeleteApi.as_view(),
-        name='salesman-retrieve-delete',
-    ),
-    path(
-        r'',
-        ShopSalesmanListCreateApi.as_view(),
-        name='salesman-list-create',
-    )
-]
 
 sales_urlpatterns = [
     path(r'', ShopSaleCreateApi.as_view(), name='sale-create'),
@@ -50,7 +37,11 @@ clients_urlpatterns = [
 
 urlpatterns = [
     path(r'clients/', include(clients_urlpatterns)),
-    path(r'salesmans/', include(salesmans_urlpatterns)),
+    path(
+        r'salesmans/',
+        ShopSalesmanListCreateApi.as_view(),
+        name='salesman-list-create',
+    ),
     path(r'sales/', include(sales_urlpatterns)),
     path(
         r'codes/',
