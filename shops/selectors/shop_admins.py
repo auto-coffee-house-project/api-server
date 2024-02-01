@@ -14,7 +14,7 @@ def get_shop_admin_by_user_id(user_id: int) -> ShopAdmin:
 def is_shop_admin(
         *,
         user_id: int,
-        shop_group_id: int,
+        shop_group_id: int | type[int],
 ) -> bool:
     return (
         ShopAdmin.objects
