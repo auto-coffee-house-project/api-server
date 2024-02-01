@@ -1,7 +1,8 @@
 from django.urls import path, include
 
 from shops.views import (
-    ShopSaleCreateApi,
+    ShopSaleCreateByUserIdApi,
+    ShopSaleCreateByCodeApi,
     SaleTemporaryCodeCreateApi,
     ShopSaleDeleteApi,
     ShopGroupRetrieveApi,
@@ -14,7 +15,16 @@ from shops.views import (
 )
 
 sales_urlpatterns = [
-    path(r'', ShopSaleCreateApi.as_view(), name='sale-create'),
+    path(
+        r'by-codes/',
+        ShopSaleCreateByCodeApi.as_view(),
+        name='sale-create-by-code',
+    ),
+    path(
+        r'by-users/',
+        ShopSaleCreateByUserIdApi.as_view(),
+        name='sale-create-by-user-id',
+    ),
     path(
         r'<int:sale_id>/',
         ShopSaleDeleteApi.as_view(),
