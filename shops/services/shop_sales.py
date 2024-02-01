@@ -5,9 +5,11 @@ from shops.exceptions import (
     ShopSaleDeleteTimeExpiredError,
     SalesmanAndSaleCodeShopGroupsNotEqualError,
     SaleTemporaryCodeExpiredError,
+    UserIsNotShopClientError,
 )
 from shops.models import ShopSale, ShopSalesman, SaleTemporaryCode, ShopGroup
 from shops.selectors import count_client_purchases_in_shop_group
+from telegram.selectors import get_user_role
 
 __all__ = ('delete_shop_sale', 'create_shop_sale', 'is_shop_sale_free')
 
@@ -38,6 +40,17 @@ def create_shop_sale(
         salesman: ShopSalesman,
         sale_temporary_code: SaleTemporaryCode,
 ) -> ShopSale:
+    role = get_user_role(
+        user_id=sale_temporary_code.client.user_id,
+        shop_group_id=sale_temporary_code.group_id,
+    )
+
+    if role != 'client':
+        raise UserIsNotShopClientError({
+            'user_id': sale_temporary_code.client.user_id,
+            'role': role,
+        })
+
     if salesman.shop.group_id != sale_temporary_code.group_id:
         raise SalesmanAndSaleCodeShopGroupsNotEqualError({
             'salesman_user_id': salesman.user_id,
