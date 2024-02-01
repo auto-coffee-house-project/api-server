@@ -7,11 +7,22 @@ from shops.exceptions import (
     SaleTemporaryCodeExpiredError,
     UserIsNotShopClientError,
 )
-from shops.models import ShopSale, ShopSalesman, SaleTemporaryCode, ShopGroup
+from shops.models import (
+    ShopSale,
+    ShopSalesman,
+    SaleTemporaryCode,
+    ShopGroup,
+    ShopClient,
+)
 from shops.selectors import count_client_purchases_in_shop_group
 from telegram.selectors import get_user_role
 
-__all__ = ('delete_shop_sale', 'create_shop_sale_by_code', 'is_shop_sale_free')
+__all__ = (
+    'delete_shop_sale',
+    'create_shop_sale_by_code',
+    'is_shop_sale_free',
+    'create_shop_sale_by_user_id',
+)
 
 
 def delete_shop_sale(shop_sale: ShopSale) -> None:
@@ -75,3 +86,21 @@ def create_shop_sale_by_code(
         sale_temporary_code.delete()
 
     return shop_sale
+
+
+def create_shop_sale_by_user_id(
+        *,
+        shop_client: ShopClient,
+        shop_salesman: ShopSalesman,
+) -> ShopSale:
+    is_free = is_shop_sale_free(
+        shop_group=shop_salesman.shop.group,
+        client_id=shop_client.id,
+    )
+
+    return ShopSale.objects.create(
+        shop=shop_salesman.shop,
+        client=shop_client,
+        salesman=shop_salesman,
+        is_free=is_free,
+    )
