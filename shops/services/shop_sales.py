@@ -11,7 +11,7 @@ from shops.models import ShopSale, ShopSalesman, SaleTemporaryCode, ShopGroup
 from shops.selectors import count_client_purchases_in_shop_group
 from telegram.selectors import get_user_role
 
-__all__ = ('delete_shop_sale', 'create_shop_sale', 'is_shop_sale_free')
+__all__ = ('delete_shop_sale', 'create_shop_sale_by_code', 'is_shop_sale_free')
 
 
 def delete_shop_sale(shop_sale: ShopSale) -> None:
@@ -35,7 +35,7 @@ def is_shop_sale_free(
     return current_cups_count == 0 and has_any_purchase
 
 
-def create_shop_sale(
+def create_shop_sale_by_code(
         *,
         salesman: ShopSalesman,
         sale_temporary_code: SaleTemporaryCode,
