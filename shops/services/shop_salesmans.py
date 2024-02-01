@@ -3,9 +3,10 @@ from django.db import transaction
 from shops.exceptions import (
     InvitationExpiredError,
     ShopSalesmanAlreadyExistsError,
+    UserAlreadyShopAdminError,
 )
 from shops.models import ShopSalesman, SalesmanInvitation
-from shops.selectors import is_shop_salesman
+from shops.selectors import is_shop_salesman, is_shop_admin
 
 __all__ = ('create_salesman_by_invitation',)
 
@@ -37,6 +38,12 @@ def create_salesman_by_invitation(
             shop_group_id=invitation.shop.group_id,
     ):
         raise ShopSalesmanAlreadyExistsError({'user_id': user_id})
+
+    if is_shop_admin(
+            user_id=user_id,
+            shop_group_id=invitation.shop.group_id,
+    ):
+        raise UserAlreadyShopAdminError({'user_id': user_id})
 
     invitation.delete()
 
