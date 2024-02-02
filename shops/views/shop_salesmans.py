@@ -9,13 +9,14 @@ from shops.selectors import (
     get_salesman_invitation_by_id,
     get_shop_group_by_bot_id,
     get_shop_admin,
+    get_shop_salesman,
 )
 from shops.services.shop_salesmans import create_salesman_by_invitation
 
-__all__ = ('ShopSalesmanListCreateApi',)
+__all__ = ('ShopSalesmanListCreateDeleteApi',)
 
 
-class ShopSalesmanListCreateApi(APIView):
+class ShopSalesmanListCreateDeleteApi(APIView):
 
     class InputListSerializer(serializers.Serializer):
         admin_user_id = serializers.IntegerField()
@@ -49,6 +50,10 @@ class ShopSalesmanListCreateApi(APIView):
     class OutputCreateSerializer(serializers.Serializer):
         shop_name = serializers.CharField(source='shop.name')
         shop_group_name = serializers.CharField(source='shop.group.name')
+
+    class InputDeleteSerializer(serializers.Serializer):
+        user_id = serializers.IntegerField()
+        bot_id = serializers.IntegerField()
 
     def get(self, request: Request) -> Response:
         serializer = self.InputListSerializer(data=request.query_params)
@@ -85,4 +90,22 @@ class ShopSalesmanListCreateApi(APIView):
 
         serializer = self.OutputCreateSerializer(invitation)
         response_data = {'ok': True, 'result': serializer.data}
+        return Response(response_data)
+
+    def delete(self, request: Request) -> Response:
+        serializer = self.InputDeleteSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        serialized_data = serializer.data
+
+        user_id: int = serialized_data['user_id']
+        bot_id: int = serialized_data['bot_id']
+
+        shop_group = get_shop_group_by_bot_id(bot_id)
+        shop_salesman = get_shop_salesman(
+            user_id=user_id,
+            shop_group_id=shop_group.id,
+        )
+        shop_salesman.delete()
+
+        response_data = {'ok': True}
         return Response(response_data)
