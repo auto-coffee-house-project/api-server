@@ -7,7 +7,8 @@ from rest_framework.views import APIView
 
 from shops.selectors import (
     get_salesman_invitation_by_id,
-    get_shop_admin_by_user_id,
+    get_shop_group_by_bot_id,
+    get_shop_admin,
 )
 from shops.services.shop_salesmans import create_salesman_by_invitation
 
@@ -18,6 +19,7 @@ class ShopSalesmanListCreateApi(APIView):
 
     class InputListSerializer(serializers.Serializer):
         admin_user_id = serializers.IntegerField()
+        bot_id = serializers.IntegerField()
 
     class OutputListSerializer(serializers.Serializer):
         class SalesmanSerializer(serializers.Serializer):
@@ -54,8 +56,13 @@ class ShopSalesmanListCreateApi(APIView):
         serialized_data = serializer.data
 
         admin_user_id: int = serialized_data['admin_user_id']
+        bot_id: int = serialized_data['bot_id']
 
-        shop_admin = get_shop_admin_by_user_id(admin_user_id)
+        shop_group = get_shop_group_by_bot_id(bot_id)
+        shop_admin = get_shop_admin(
+            user_id=admin_user_id,
+            shop_group_id=shop_group.id,
+        )
 
         serializer = self.OutputListSerializer(shop_admin)
 

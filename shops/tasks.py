@@ -1,9 +1,9 @@
 from celery import shared_task
 
-from shops.models import ShopClient, ShopSalesman, ShopSale
+from shops.models import ShopSale
 from shops.selectors import (
     get_expired_sale_temporary_codes,
-    get_shop_admin_by_user_id,
+    get_shop_admin,
 )
 from telegram.services.bots import send_messages
 
@@ -14,8 +14,11 @@ def remove_expired_tasks() -> None:
 
 
 @shared_task
-def start_mailing(admin_user_id: int, text: str) -> None:
-    shop_admin = get_shop_admin_by_user_id(admin_user_id)
+def start_mailing(admin_user_id: int, shop_group_id: int, text: str) -> None:
+    shop_admin = get_shop_admin(
+        user_id=admin_user_id,
+        shop_group_id=shop_group_id,
+    )
 
     shop_user_ids = (
         ShopSale
