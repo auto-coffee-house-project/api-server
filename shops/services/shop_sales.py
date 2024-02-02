@@ -46,21 +46,31 @@ def is_shop_sale_free(
     return current_cups_count == 0 and has_any_purchase
 
 
+def validate_user_is_client(
+        *,
+        user_id: int | type[int],
+        shop_group_id: int | type[int],
+) -> None:
+    role = get_user_role(
+        user_id=user_id,
+        shop_group_id=shop_group_id,
+    )
+    if role != 'client':
+        raise UserIsNotShopClientError({
+            'user_id': user_id,
+            'role': role,
+        })
+
+
 def create_shop_sale_by_code(
         *,
         salesman: ShopSalesman,
         sale_temporary_code: SaleTemporaryCode,
 ) -> ShopSale:
-    role = get_user_role(
+    validate_user_is_client(
         user_id=sale_temporary_code.client.user_id,
         shop_group_id=sale_temporary_code.group_id,
     )
-
-    if role != 'client':
-        raise UserIsNotShopClientError({
-            'user_id': sale_temporary_code.client.user_id,
-            'role': role,
-        })
 
     if salesman.shop.group_id != sale_temporary_code.group_id:
         raise SalesmanAndSaleCodeShopGroupsNotEqualError({
@@ -93,6 +103,11 @@ def create_shop_sale_by_user_id(
         shop_client: ShopClient,
         shop_salesman: ShopSalesman,
 ) -> ShopSale:
+    validate_user_is_client(
+        user_id=shop_client.user_id,
+        shop_group_id=shop_salesman.shop.group_id,
+    )
+
     is_free = is_shop_sale_free(
         shop_group=shop_salesman.shop.group,
         client_id=shop_client.id,

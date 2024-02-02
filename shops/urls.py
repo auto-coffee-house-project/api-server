@@ -7,9 +7,8 @@ from shops.views import (
     ShopSaleDeleteApi,
     ShopGroupRetrieveApi,
     SalesmanInvitationCreateApi,
-    ShopAdminRetrieveApi,
     MailingCreateApi,
-    ShopSalesmanListCreateApi,
+    ShopSalesmanListCreateDeleteApi,
     ShopClientStatisticsRetrieveApi,
     ShopClientStatisticsListApi,
 )
@@ -49,8 +48,8 @@ urlpatterns = [
     path(r'clients/', include(clients_urlpatterns)),
     path(
         r'salesmans/',
-        ShopSalesmanListCreateApi.as_view(),
-        name='salesman-list-create',
+        ShopSalesmanListCreateDeleteApi.as_view(),
+        name='salesman-list-create-delete',
     ),
     path(r'sales/', include(sales_urlpatterns)),
     path(
@@ -67,11 +66,6 @@ urlpatterns = [
         r'invitations/',
         SalesmanInvitationCreateApi.as_view(),
         name='invitation-create',
-    ),
-    path(
-        r'admins/<int:user_id>/',
-        ShopAdminRetrieveApi.as_view(),
-        name='admin-retrieve',
     ),
     path(
         r'mailings/',

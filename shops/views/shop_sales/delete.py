@@ -1,4 +1,3 @@
-from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,4 +14,4 @@ class ShopSaleDeleteApi(APIView):
         shop_sale = get_shop_sale_by_id(sale_id)
         delete_shop_sale(shop_sale)
         response_data = {'ok': True}
-        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
+        return Response(response_data)

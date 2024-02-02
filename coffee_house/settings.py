@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'import_export',
+    'core',
     'shops',
     'telegram',
 ]
