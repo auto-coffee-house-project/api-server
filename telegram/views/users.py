@@ -66,7 +66,7 @@ class UserRetrieveCreateUpdateApi(APIView):
             last_name=serialized_data['last_name'],
             username=serialized_data['username'],
         )
-        get_or_create_shop_client(user.id)
+        get_or_create_shop_client(user_id=user.id, shop_group_id=shop_group.id)
         role = get_user_role(user_id=user.id, shop_group_id=shop_group.id)
 
         serializer = self.OutputSerializer(user)

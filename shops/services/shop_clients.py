@@ -6,11 +6,21 @@ from shops.selectors import count_client_purchases_in_shop_group
 __all__ = ('get_or_create_shop_client', 'get_shop_client_statistics')
 
 
-def get_or_create_shop_client(user_id: int) -> tuple[ShopClient, bool]:
+def get_or_create_shop_client(
+        *,
+        user_id: int,
+        shop_group_id: int,
+) -> tuple[ShopClient, bool]:
     try:
-        return ShopClient.objects.get(user_id=user_id), False
+        return ShopClient.objects.get(
+            user_id=user_id,
+            group_id=shop_group_id,
+        ), False
     except ShopClient.DoesNotExist:
-        return ShopClient.objects.create(user_id=user_id), True
+        return ShopClient.objects.create(
+            user_id=user_id,
+            group_id=shop_group_id,
+        ), True
 
 
 def get_shop_client_statistics(
