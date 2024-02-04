@@ -5,7 +5,7 @@ from shops.views import (
     ShopSaleCreateByCodeApi,
     SaleTemporaryCodeCreateApi,
     ShopSaleDeleteApi,
-    ShopGroupRetrieveApi,
+    ShopGroupRetrieveUpdateApi,
     SalesmanInvitationCreateApi,
     MailingCreateApi,
     ShopSalesmanListCreateDeleteApi,
@@ -59,7 +59,7 @@ urlpatterns = [
     ),
     path(
         r'groups/bots/<int:bot_id>/',
-        ShopGroupRetrieveApi.as_view(),
+        ShopGroupRetrieveUpdateApi.as_view(),
         name='group-retrieve',
     ),
     path(
