@@ -19,6 +19,13 @@ class Bot(models.Model):
             ' свою первую покупку кофе! ☕️'
         ),
     )
+    start_text_client_web_app = models.TextField(
+        max_length=4096,
+        default=(
+            'Мы с удовольствием угостим бесплатным кофе, приходи к нам почаще и копи свои бонусы,'
+            ' ведь каждая N-я кружка кофе в подарок!'
+        ),
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
