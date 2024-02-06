@@ -17,3 +17,4 @@ class BotFactory(DjangoModelFactory):
     name = factory.Faker('name')
     username = FuzzyText(suffix='bot')
     start_text = factory.Faker('text')
+    start_text_client_web_app = factory.Faker('text')
