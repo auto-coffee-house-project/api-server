@@ -33,6 +33,7 @@ class ShopClient(models.Model):
     class Meta:
         verbose_name = 'client'
         verbose_name_plural = 'clients'
+        unique_together = ('user', 'shop_group')
 
     def __str__(self) -> str:
         return str(self.user)
