@@ -30,6 +30,7 @@ def get_shop_client_statistics(
     return ShopClientStatistics(
         user_id=shop_client.user.id,
         shop_group_bot_id=shop_group.bot.id,
+        has_gift=shop_client.has_gift,
         purchases_count=total_purchases_count,
         each_nth_cup_free=shop_group.each_nth_cup_free,
         current_cups_count=current_cups_count,

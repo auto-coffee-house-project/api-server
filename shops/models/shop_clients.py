@@ -11,6 +11,7 @@ __all__ = ('ShopClient', 'ShopClientStatistics')
 @dataclass(frozen=True, slots=True)
 class ShopClientStatistics:
     user_id: int
+    has_gift: bool
     shop_group_bot_id: int
     each_nth_cup_free: int
     purchases_count: int

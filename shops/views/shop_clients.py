@@ -23,6 +23,7 @@ class ShopClientStatisticsRetrieveApi(APIView):
 
     class OutputSerializer(serializers.Serializer):
         user_id = serializers.IntegerField()
+        has_gift = serializers.BooleanField()
         shop_group_bot_id = serializers.IntegerField()
         each_nth_cup_free = serializers.IntegerField()
         purchases_count = serializers.IntegerField()
