@@ -13,6 +13,7 @@ class ShopGroupRetrieveUpdateApi(APIView):
         gift_name = serializers.CharField(max_length=64)
         gift_photo_url = serializers.URLField(allow_null=True)
         each_nth_cup_free = serializers.IntegerField()
+        is_menu_shown = serializers.BooleanField()
 
     class OutputSerializer(serializers.Serializer):
         id = serializers.IntegerField()
@@ -20,6 +21,7 @@ class ShopGroupRetrieveUpdateApi(APIView):
         gift_name = serializers.CharField()
         gift_photo_url = serializers.URLField(allow_null=True)
         each_nth_cup_free = serializers.IntegerField()
+        is_menu_shown = serializers.BooleanField()
         created_at = serializers.DateTimeField()
 
     def get(self, request: Request, bot_id: int) -> Response:
@@ -38,6 +40,7 @@ class ShopGroupRetrieveUpdateApi(APIView):
         shop_group.gift_name = serialized_data['gift_name']
         shop_group.gift_photo_url = serialized_data['gift_photo_url']
         shop_group.each_nth_cup_free = serialized_data['each_nth_cup_free']
+        shop_group.is_menu_shown = serialized_data['is_menu_shown']
         shop_group.save()
 
         response_data = {'ok': True, 'result': self.OutputSerializer(shop_group).data}
