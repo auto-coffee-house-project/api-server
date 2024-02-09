@@ -19,7 +19,7 @@ class ShopClientStatistics:
 
 
 class ShopClient(models.Model):
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,
     )
