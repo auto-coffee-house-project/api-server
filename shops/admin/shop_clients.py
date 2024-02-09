@@ -15,11 +15,11 @@ class SaleInline(admin.TabularInline):
 
 @admin.register(ShopClient)
 class ShopClientAdmin(ImportExportModelAdmin):
-    autocomplete_fields = ('user', 'shop')
+    autocomplete_fields = ('user', 'shop_group')
     search_fields = ('user__id', 'user__first_name', 'user__username')
     search_help_text = 'User ID, name or username'
     ordering = ('-created_at',)
-    list_display = ('user', 'shop', 'has_gift', 'created_at')
-    list_select_related = ('user', 'shop')
+    list_display = ('user', 'shop_group', 'has_gift', 'created_at')
+    list_select_related = ('user', 'shop_group')
     list_filter = ('shop', 'has_gift')
     inlines = (SaleInline,)
