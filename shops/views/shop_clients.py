@@ -37,7 +37,7 @@ class ShopClientStatisticsRetrieveApi(APIView):
         user_id: int = serialized_data['user_id']
         bot_id: int = serialized_data['bot_id']
 
-        shop_client = get_shop_client_by_user_id(user_id)
+        shop_client = get_shop_client_by_user_id(user_id, bot_id)
         shop_group = get_shop_group_by_bot_id(bot_id)
 
         shop_client_statistics = get_shop_client_statistics(

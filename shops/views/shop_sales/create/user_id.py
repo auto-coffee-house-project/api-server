@@ -37,7 +37,7 @@ class ShopSaleCreateByUserIdApi(APIView):
 
         shop_group = get_shop_group_by_bot_id(bot_id)
 
-        shop_client = get_shop_client_by_user_id(client_user_id)
+        shop_client = get_shop_client_by_user_id(client_user_id, bot_id)
         shop_salesman = get_shop_salesman(
             user_id=salesman_user_id,
             shop_group_id=shop_group.id,
