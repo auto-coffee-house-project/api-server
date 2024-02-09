@@ -21,5 +21,5 @@ class ShopClientAdmin(ImportExportModelAdmin):
     ordering = ('-created_at',)
     list_display = ('user', 'shop_group', 'has_gift', 'created_at')
     list_select_related = ('user', 'shop_group')
-    list_filter = ('shop', 'has_gift')
+    list_filter = ('shop_group', 'has_gift')
     inlines = (SaleInline,)
