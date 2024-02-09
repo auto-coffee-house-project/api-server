@@ -25,9 +25,7 @@ class ShopClient(models.Model):
     )
     shop_group = models.ForeignKey(
         to=ShopGroup,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.CASCADE,
     )
     has_gift = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
