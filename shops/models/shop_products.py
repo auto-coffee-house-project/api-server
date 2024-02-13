@@ -9,7 +9,7 @@ __all__ = ('ShopProduct',)
 
 
 def get_shop_product_photo_path(instance: 'ShopProduct', filename: str) -> str:
-    file_extension = filename.split('.')[-1]
+    file_extension = filename.split('.')[-1].lower()
     filename = f'{uuid4().hex}.{file_extension}'
     return f'{instance.shop_group_id}/{filename}'
 
