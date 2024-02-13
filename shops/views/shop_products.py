@@ -38,7 +38,7 @@ class ShopProductListCreateApi(APIView):
 
         id = serializers.IntegerField()
         name = serializers.CharField()
-        price = serializers.DecimalField()
+        price = serializers.DecimalField(max_digits=10, decimal_places=2)
         categories = CategorySerializer(many=True)
         photos = PhotoSerializer(many=True)
 
