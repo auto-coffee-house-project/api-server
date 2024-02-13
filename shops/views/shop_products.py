@@ -36,15 +36,11 @@ class ShopProductListCreateApi(APIView):
             id = serializers.IntegerField()
             name = serializers.CharField()
 
-        class PhotoSerializer(serializers.Serializer):
-            url = serializers.URLField()
-            is_main = serializers.BooleanField()
-
         id = serializers.IntegerField()
         name = serializers.CharField()
         price = serializers.DecimalField(max_digits=10, decimal_places=2)
         categories = CategorySerializer(many=True)
-        photos = PhotoSerializer(many=True)
+        photo = serializers.ImageField(allow_null=True)
 
     def get(self, request: Request) -> Response:
         serializer = self.InputListSerializer(data=request.query_params)
@@ -73,7 +69,7 @@ class ShopProductListCreateApi(APIView):
         return Response(response_data)
 
     def post(self, request: Request) -> Response:
-        serializer = self.InputSerializer(data=request.data)
+        serializer = self.InputCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serialized_data = serializer.data
 
