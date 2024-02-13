@@ -4,7 +4,6 @@ from .shop_admins import *
 from .shop_clients import *
 from .shop_groups import *
 from .shop_product_categories import *
-from .shop_product_photos import *
 from .shop_products import *
 from .shop_sales import *
 from .shop_salesmans import *
