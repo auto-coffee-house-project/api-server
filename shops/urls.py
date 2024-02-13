@@ -12,6 +12,7 @@ from shops.views import (
     ShopClientStatisticsRetrieveApi,
     ShopClientStatisticsListApi,
 )
+from shops.views.shop_products import ShopProductListCreateApi
 
 sales_urlpatterns = [
     path(
@@ -45,6 +46,11 @@ clients_urlpatterns = [
 ]
 
 urlpatterns = [
+    path(
+        r'products/',
+        ShopProductListCreateApi.as_view(),
+        name='product-list-create',
+    ),
     path(r'clients/', include(clients_urlpatterns)),
     path(
         r'salesmans/',
