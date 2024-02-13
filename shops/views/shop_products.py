@@ -17,6 +17,10 @@ class ShopProductListCreateApi(APIView):
     authentication_classes = [BotAuthentication]
     permission_classes = [HasBot]
 
+    class InputListSerializer(serializers.Serializer):
+        limit = serializers.IntegerField(min_value=1, max_value=100, default=10)
+        offset = serializers.IntegerField(min_value=0, default=0)
+
     class InputSerializer(serializers.Serializer):
         class PhotoSerializer(serializers.Serializer):
             url = serializers.URLField()
@@ -41,6 +45,32 @@ class ShopProductListCreateApi(APIView):
         price = serializers.DecimalField(max_digits=10, decimal_places=2)
         categories = CategorySerializer(many=True)
         photos = PhotoSerializer(many=True)
+
+    def get(self, request: Request) -> Response:
+        serializer = self.InputListSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        serialized_data = serializer.data
+
+        limit: int = serialized_data['limit']
+        offset: int = serialized_data['offset']
+
+        bot: Bot = request.META['bot']
+
+        products = bot.shopgroup.shopproduct_set.order_by('-created_at')[
+                   offset:offset + limit + 1]
+        is_end_of_list_reached = len(products) <= limit
+
+        products = products[:limit]
+
+        serializer = self.OutputSerializer(products, many=True)
+        response_data = {
+            'ok': True,
+            'result': {
+                'is_end_of_list_reached': is_end_of_list_reached,
+                'products': serializer.data,
+            },
+        }
+        return Response(response_data)
 
     def post(self, request: Request) -> Response:
         serializer = self.InputSerializer(data=request.data)
