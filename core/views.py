@@ -51,7 +51,10 @@ def exception_handler(exc, context) -> Response | None:
     if isinstance(exc.detail, (list, dict)):
         response.data = {'detail': response.data}
 
-    if isinstance(exc, ObjectDoesNotExistError):
+    if isinstance(exc, drf_exceptions.NotAuthenticated):
+        response.data['message'] = response.data.pop('detail')
+        response.data['extra'] = None
+    elif isinstance(exc, ObjectDoesNotExistError):
         response.data['message'] = exc.default_code
         response.data['extra'] = response.data.pop('detail', None)
     elif isinstance(exc, drf_exceptions.ValidationError):
