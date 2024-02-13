@@ -29,7 +29,7 @@ class SaleTemporaryCodeCreateApi(APIView):
         client_user_id: int = serialized_data['client_user_id']
         bot_id: int = serialized_data['bot_id']
 
-        shop_client = get_shop_client_by_user_id(client_user_id)
+        shop_client = get_shop_client_by_user_id(client_user_id, bot_id)
         shop_group = get_shop_group_by_bot_id(bot_id)
 
         sale_temporary_code = create_sale_temporary_code(

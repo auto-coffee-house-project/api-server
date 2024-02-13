@@ -3,7 +3,7 @@ from django.urls import path, include
 from telegram.views import (
     UserRetrieveCreateUpdateApi,
     BotListApi,
-    BotRetrieveApi,
+    BotRetrieveUpdateApi,
 )
 
 app_name = 'telegram'
@@ -16,7 +16,7 @@ bots_urlpatterns = [
     ),
     path(
         r'<int:bot_id>/',
-        BotRetrieveApi.as_view(),
+        BotRetrieveUpdateApi.as_view(),
         name='bot-retrieve',
     )
 ]

@@ -23,6 +23,7 @@ class ShopClientStatisticsRetrieveApi(APIView):
 
     class OutputSerializer(serializers.Serializer):
         user_id = serializers.IntegerField()
+        has_gift = serializers.BooleanField()
         shop_group_bot_id = serializers.IntegerField()
         each_nth_cup_free = serializers.IntegerField()
         purchases_count = serializers.IntegerField()
@@ -36,7 +37,7 @@ class ShopClientStatisticsRetrieveApi(APIView):
         user_id: int = serialized_data['user_id']
         bot_id: int = serialized_data['bot_id']
 
-        shop_client = get_shop_client_by_user_id(user_id)
+        shop_client = get_shop_client_by_user_id(user_id, bot_id)
         shop_group = get_shop_group_by_bot_id(bot_id)
 
         shop_client_statistics = get_shop_client_statistics(

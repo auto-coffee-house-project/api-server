@@ -40,5 +40,10 @@ class SalesmanInvitationCreateApi(APIView):
         salesman_invitation = create_salesman_invitation(shop_admin)
 
         serializer = self.OutputSerializer(salesman_invitation)
-        response_data = {'ok': True, 'result': serializer.data}
+        response_data = {
+            'ok': True,
+            'result': serializer.data | {
+                'url': f'https://t.me/{shop_group.bot.username}?start=invite-{salesman_invitation.id.hex}'
+            },
+        }
         return Response(response_data)

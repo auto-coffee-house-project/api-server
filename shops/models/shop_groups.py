@@ -13,7 +13,10 @@ class ShopGroup(models.Model):
         null=True,
         blank=True
     )
+    gift_name = models.CharField(max_length=64, default='Бесплатная чашка кофе')
+    gift_photo_url = models.URLField(null=True, blank=True)
     each_nth_cup_free = models.PositiveSmallIntegerField()
+    is_menu_shown = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

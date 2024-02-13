@@ -11,16 +11,10 @@ def get_or_create_shop_client(
         user_id: int,
         shop_group_id: int,
 ) -> tuple[ShopClient, bool]:
-    try:
-        return ShopClient.objects.get(
-            user_id=user_id,
-            group_id=shop_group_id,
-        ), False
-    except ShopClient.DoesNotExist:
-        return ShopClient.objects.create(
-            user_id=user_id,
-            group_id=shop_group_id,
-        ), True
+    return ShopClient.objects.get_or_create(
+        user_id=user_id,
+        shop_group_id=shop_group_id,
+    )
 
 
 def get_shop_client_statistics(
@@ -36,6 +30,7 @@ def get_shop_client_statistics(
     return ShopClientStatistics(
         user_id=shop_client.user.id,
         shop_group_bot_id=shop_group.bot.id,
+        has_gift=shop_client.has_gift,
         purchases_count=total_purchases_count,
         each_nth_cup_free=shop_group.each_nth_cup_free,
         current_cups_count=current_cups_count,
