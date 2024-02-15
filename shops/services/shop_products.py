@@ -14,13 +14,31 @@ def create_shop_product(
         name: str,
         price: Decimal,
         shop_group_id: int | type[int],
-        category_ids: Iterable[int],
+        category_names: Iterable[str],
 ) -> ShopProduct:
+    category_names = set(category_names)
+
     product = ShopProduct.objects.create(
         name=name,
         price=price,
         shop_group_id=shop_group_id,
     )
-    categories = ShopProductCategory.objects.filter(id__in=category_ids)
-    product.categories.bulk_create(categories)
+    existing_categories = (
+        ShopProductCategory.objects
+        .filter(name__in=category_names)
+    )
+    existing_category_names = {
+        category.name for category in existing_categories
+    }
+    new_category_names = category_names - existing_category_names
+
+    new_categories = [
+        ShopProductCategory(name=name)
+        for name in new_category_names
+    ]
+    new_categories = ShopProductCategory.objects.bulk_create(new_categories)
+    categories = list(existing_categories) + new_categories
+
+    product.categories.add(*categories)
+
     return product

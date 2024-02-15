@@ -20,9 +20,8 @@ class ShopProductListCreateApi(APIView):
     class InputCreateSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=100)
         price = serializers.DecimalField(max_digits=10, decimal_places=2)
-        category_ids = serializers.ListField(
-            child=serializers.IntegerField(),
-            required=False,
+        category_names = serializers.ListField(
+            child=serializers.CharField(max_length=64),
             allow_empty=True,
         )
 
@@ -56,7 +55,7 @@ class ShopProductListCreateApi(APIView):
 
         name: str = serialized_data['name']
         price: Decimal = serialized_data['price']
-        category_ids: set[int] = set(serialized_data['category_ids'])
+        category_names: set[str] = set(serialized_data['category_names'])
 
         bot: Bot = request.META['bot']
 
@@ -64,7 +63,7 @@ class ShopProductListCreateApi(APIView):
             name=name,
             price=price,
             shop_group_id=bot.shopgroup.id,
-            category_ids=category_ids,
+            category_names=category_names,
         )
 
         serializer = self.OutputSerializer(product)
