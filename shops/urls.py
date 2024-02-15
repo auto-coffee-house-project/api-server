@@ -12,7 +12,10 @@ from shops.views import (
     ShopClientStatisticsRetrieveApi,
     ShopClientStatisticsListApi,
 )
-from shops.views.shop_products import ShopProductListCreateApi
+from shops.views.shop_products import (
+    ShopProductListCreateApi,
+    ShopProductRetrieveUpdateDeleteApi,
+)
 
 sales_urlpatterns = [
     path(
@@ -46,6 +49,11 @@ clients_urlpatterns = [
 ]
 
 urlpatterns = [
+    path(
+        r'products/<int:product_id>/',
+        ShopProductRetrieveUpdateDeleteApi.as_view(),
+        name='product-retrieve-update-delete',
+    ),
     path(
         r'products/',
         ShopProductListCreateApi.as_view(),
