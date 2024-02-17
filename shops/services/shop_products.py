@@ -1,11 +1,16 @@
 from collections.abc import Iterable
 from decimal import Decimal
 
+from django.core.files.uploadedfile import UploadedFile
 from django.db import transaction
 
 from shops.models import ShopProduct, ShopProductCategory
 
-__all__ = ('create_shop_product', 'update_shop_product')
+__all__ = (
+    'create_shop_product',
+    'update_shop_product',
+    'update_shop_product_photo',
+)
 
 
 @transaction.atomic
@@ -81,3 +86,12 @@ def update_shop_product(
     product.categories.add(*categories)
 
     return product
+
+
+def update_shop_product_photo(
+        shop_product: ShopProduct,
+        photo: UploadedFile
+) -> ShopProduct:
+    shop_product.photo = photo
+    shop_product.save()
+    return shop_product

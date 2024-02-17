@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import serializers, status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -9,12 +10,41 @@ from shops.selectors.shop_products import get_shop_product
 from shops.services.shop_products import (
     create_shop_product,
     update_shop_product,
+    update_shop_product_photo,
 )
 from telegram.authentication import BotAuthentication
 from telegram.models import Bot
 from telegram.permissions import HasBot
 
-__all__ = ('ShopProductListCreateApi', 'ShopProductRetrieveUpdateDeleteApi')
+__all__ = (
+    'ShopProductListCreateApi',
+    'ShopProductRetrieveUpdateDeleteApi',
+    'ShopProductPhotoUpdateApi',
+)
+
+
+class ShopProductPhotoUpdateApi(APIView):
+    authentication_classes = [BotAuthentication]
+    permission_classes = [HasBot]
+
+    def post(self, request: Request, product_id: int) -> Response:
+        if 'photo' not in request.data:
+            raise serializers.ValidationError('Photo is required')
+
+        bot = request.META['bot']
+        photo: InMemoryUploadedFile = request.data['photo']
+
+        shop_product = get_shop_product(bot_id=bot.id, product_id=product_id)
+        update_shop_product_photo(shop_product=shop_product, photo=photo)
+
+        response_data = {
+            'ok': True,
+            'result': {
+                'id': shop_product.id,
+                'photo': shop_product.photo,
+            },
+        }
+        return Response(response_data)
 
 
 class ShopProductRetrieveUpdateDeleteApi(APIView):
