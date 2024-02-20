@@ -22,7 +22,7 @@ class ShopGroup(models.Model):
         blank=True
     )
     gift_name = models.CharField(max_length=64, default='Бесплатная чашка кофе')
-    gift_photo_url = models.ImageField(
+    gift_photo = models.ImageField(
         upload_to=get_gift_photo_path,
         null=True,
         blank=True,

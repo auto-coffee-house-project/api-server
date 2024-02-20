@@ -1,20 +1,16 @@
-from django.urls import path, include
+from django.urls import include, path
 
 from shops.views import (
-    ShopSaleCreateByUserIdApi,
-    ShopSaleCreateByCodeApi,
-    SaleTemporaryCodeCreateApi,
-    ShopSaleDeleteApi,
-    ShopGroupRetrieveUpdateApi,
-    SalesmanInvitationCreateApi,
-    MailingCreateApi,
+    MailingCreateApi, SaleTemporaryCodeCreateApi, SalesmanInvitationCreateApi,
+    ShopClientStatisticsListApi, ShopClientStatisticsRetrieveApi,
+    ShopGroupGiftPhotoUpdateApi, ShopGroupRetrieveUpdateApi,
+    ShopSaleCreateByCodeApi, ShopSaleCreateByUserIdApi, ShopSaleDeleteApi,
     ShopSalesmanListCreateDeleteApi,
-    ShopClientStatisticsRetrieveApi,
-    ShopClientStatisticsListApi,
 )
 from shops.views.shop_products import (
     ShopProductListCreateApi,
-    ShopProductPhotoUpdateApi, ShopProductRetrieveUpdateDeleteApi,
+    ShopProductPhotoUpdateApi,
+    ShopProductRetrieveUpdateDeleteApi,
 )
 
 sales_urlpatterns = [
@@ -75,6 +71,10 @@ urlpatterns = [
         r'codes/',
         SaleTemporaryCodeCreateApi.as_view(),
         name='sale-temporary-code-create',
+    ),
+    path(
+        r'groups/me/gift-photos/',
+        ShopGroupGiftPhotoUpdateApi.as_view(),
     ),
     path(
         r'groups/bots/<int:bot_id>/',

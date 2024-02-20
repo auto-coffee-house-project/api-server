@@ -28,7 +28,6 @@ class ShopProduct(models.Model):
     )
     categories = models.ManyToManyField(
         to=ShopProductCategory,
-        null=True,
         blank=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
