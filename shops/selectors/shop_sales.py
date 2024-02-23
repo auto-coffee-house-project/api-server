@@ -1,5 +1,7 @@
+from django.db.models import Case, Count, IntegerField, When
+
 from core.exceptions import ObjectDoesNotExistError
-from shops.models import ShopSale, Shop
+from shops.models import ShopSale
 
 __all__ = (
     'count_client_purchases_in_shop_group',
@@ -10,14 +12,24 @@ __all__ = (
 def count_client_purchases_in_shop_group(
         *,
         client_id: int | type[int],
-        shop_group_id: int | type[int],
-) -> int:
-    shops = Shop.objects.filter(group_id=shop_group_id)
-    sales = ShopSale.objects.filter(
-        client_id=client_id,
-        shop__in=shops,
+        shop_id: int | type[int],
+) -> dict:
+    return (
+        ShopSale.objects
+        .filter(client_id=client_id, shop_id=shop_id)
+        .aggregate(
+            total_purchases_count=Count('id'),
+            free_purchases_count=Count(
+                Case(
+                    When(
+                        is_free=True,
+                        then=1,
+                    ),
+                    output_field=IntegerField(),
+                )
+            )
+        )
     )
-    return sales.count()
 
 
 def get_shop_sale_by_id(sale_id: int) -> ShopSale:

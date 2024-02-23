@@ -18,7 +18,7 @@ def create_shop_product(
         *,
         name: str,
         price: Decimal,
-        shop_group_id: int | type[int],
+        shop_id: int | type[int],
         category_names: Iterable[str],
 ) -> ShopProduct:
     category_names = set(category_names)
@@ -26,7 +26,7 @@ def create_shop_product(
     product = ShopProduct.objects.create(
         name=name,
         price=price,
-        shop_group_id=shop_group_id,
+        shop_id=shop_id,
     )
     existing_categories = (
         ShopProductCategory.objects
@@ -56,13 +56,11 @@ def update_shop_product(
         name: str,
         price: Decimal,
         category_names: Iterable[str],
-        photo: str | None,
 ) -> ShopProduct:
     category_names = set(category_names)
 
     product.name = name
     product.price = price
-    product.photo = photo
     product.save()
 
     existing_categories = list(

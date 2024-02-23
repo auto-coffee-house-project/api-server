@@ -3,20 +3,21 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from telegram.selectors import get_bots, get_bot_by_id
+from telegram.authentication import BotAuthentication
+from telegram.models import Bot
+from telegram.permissions import HasBot
+from telegram.selectors import get_bots
 
 __all__ = ('BotListApi', 'BotRetrieveUpdateApi')
 
 
 class BotListApi(APIView):
-
     class OutputSerializer(serializers.Serializer):
         id = serializers.IntegerField()
         name = serializers.CharField()
         token = serializers.CharField()
         username = serializers.CharField()
         start_text = serializers.CharField()
-        start_text_client_web_app = serializers.CharField()
         created_at = serializers.DateTimeField()
 
     def get(self, request: Request) -> Response:
@@ -27,6 +28,8 @@ class BotListApi(APIView):
 
 
 class BotRetrieveUpdateApi(APIView):
+    authentication_classes = [BotAuthentication]
+    permission_classes = [HasBot]
 
     class InputUpdateSerializer(serializers.Serializer):
         start_text = serializers.CharField(max_length=1024)
@@ -38,25 +41,22 @@ class BotRetrieveUpdateApi(APIView):
         token = serializers.CharField()
         username = serializers.CharField()
         start_text = serializers.CharField()
-        start_text_client_web_app = serializers.CharField()
         created_at = serializers.DateTimeField()
 
-    def get(self, request: Request, bot_id: int) -> Response:
-        bot = get_bot_by_id(bot_id)
+    def get(self, request: Request) -> Response:
+        bot: Bot = request.META['bot']
         serializer = self.OutputSerializer(bot)
         response_data = {'ok': True, 'result': serializer.data}
         return Response(response_data)
 
-    def put(self, request, bot_id: int) -> Response:
+    def put(self, request) -> Response:
         serializer = self.InputUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serialized_data = serializer.data
 
-        start_text: int = serialized_data['start_text']
+        bot: Bot = request.META['bot']
 
-        bot = get_bot_by_id(bot_id)
-
-        bot.start_text = start_text
+        bot.start_text = serialized_data['start_text']
         bot.save()
 
         serializer = self.OutputSerializer(bot)

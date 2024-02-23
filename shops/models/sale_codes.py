@@ -1,6 +1,6 @@
 import random
 import string
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 from django.conf import settings
@@ -8,32 +8,26 @@ from django.db import models
 from django.utils import timezone
 
 from shops.models.shop_clients import ShopClient
-from shops.models.shop_groups import ShopGroup
+from shops.models.shops import Shop
 
-__all__ = ('SaleTemporaryCode',)
+__all__ = ('SaleCode',)
 
 
 def generate_code() -> str:
     return ''.join(random.choices(string.digits, k=4))
 
 
-class SaleTemporaryCode(models.Model):
+class SaleCode(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    client = models.ForeignKey(
-        to=ShopClient,
-        on_delete=models.CASCADE,
-    )
-    group = models.ForeignKey(
-        to=ShopGroup,
-        on_delete=models.CASCADE,
-    )
+    shop = models.ForeignKey(to=Shop, on_delete=models.CASCADE)
+    client = models.ForeignKey(to=ShopClient, on_delete=models.CASCADE)
     code = models.CharField(max_length=4, default=generate_code)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'code'
-        verbose_name_plural = 'codes'
-        unique_together = ('client', 'group', 'code')
+        verbose_name = 'sale code'
+        verbose_name_plural = 'sale codes'
+        unique_together = ('shop', 'code')
 
     def __str__(self) -> str:
         return self.code

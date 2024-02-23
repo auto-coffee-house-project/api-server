@@ -3,19 +3,26 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shops.selectors import get_shop_client_by_user_id, get_shop_group_by_bot_id
-from shops.services.sale_temporary_codes import create_sale_temporary_code
+from shops.permissions import HasShop
+from shops.selectors import get_shop_client
+from shops.services.sale_codes import refresh_sale_code
+from telegram.authentication import BotAuthentication
+from telegram.models import Bot
+from telegram.permissions import HasBot
 
-__all__ = ('SaleTemporaryCodeCreateApi',)
+__all__ = ('SaleCodeCreateApi',)
 
 
-class SaleTemporaryCodeCreateApi(APIView):
+class SaleCodeCreateApi(APIView):
+    authentication_classes = [BotAuthentication]
+    permission_classes = [HasBot, HasShop]
 
     class InputSerializer(serializers.Serializer):
-        bot_id = serializers.IntegerField()
         client_user_id = serializers.IntegerField()
 
     class OutputSerializer(serializers.Serializer):
+        client_id = serializers.IntegerField(source='client.id')
+        client_user_id = serializers.IntegerField(source='client.user.id')
         code = serializers.CharField()
         created_at = serializers.DateTimeField()
         expires_at = serializers.DateTimeField()
@@ -23,20 +30,16 @@ class SaleTemporaryCodeCreateApi(APIView):
     def post(self, request: Request) -> Response:
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         serialized_data = serializer.data
 
         client_user_id: int = serialized_data['client_user_id']
-        bot_id: int = serialized_data['bot_id']
+        bot: Bot = request.META['bot']
 
-        shop_client = get_shop_client_by_user_id(client_user_id, bot_id)
-        shop_group = get_shop_group_by_bot_id(bot_id)
+        shop = bot.shop
 
-        sale_temporary_code = create_sale_temporary_code(
-            shop_client_id=shop_client.id,
-            shop_group_id=shop_group.id,
-        )
+        client = get_shop_client(user_id=client_user_id, shop_id=shop.id)
+        sale_code = refresh_sale_code(client_id=client.id, shop_id=shop.id)
 
-        serializer = self.OutputSerializer(sale_temporary_code)
+        serializer = self.OutputSerializer(sale_code)
         response_data = {'ok': True, 'result': serializer.data}
         return Response(response_data)

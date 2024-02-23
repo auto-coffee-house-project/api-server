@@ -3,54 +3,54 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shops.selectors import get_sale_temporary_code, get_shop_salesman
+from shops.permissions import HasShop
+from shops.selectors import get_sale_code, get_shop_employee
 from shops.services.shop_clients import get_shop_client_statistics
 from shops.services.shop_sales import create_shop_sale_by_code
+from telegram.authentication import BotAuthentication
+from telegram.models import Bot
+from telegram.permissions import HasBot
 
 __all__ = ('ShopSaleCreateByCodeApi',)
 
 
 class ShopSaleCreateByCodeApi(APIView):
+    authentication_classes = [BotAuthentication]
+    permission_classes = [HasBot, HasShop]
 
     class InputSerializer(serializers.Serializer):
         code = serializers.CharField()
-        salesman_user_id = serializers.IntegerField()
-
-    class OutputSerializer(serializers.Serializer):
-        id = serializers.IntegerField()
-        is_free = serializers.BooleanField()
-        client_user_id = serializers.IntegerField(source='client.user_id')
+        employee_user_id = serializers.IntegerField()
 
     def post(self, request: Request) -> Response:
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serialized_data = serializer.data
 
-        code: str = serialized_data['code']
-        salesman_user_id: int = serialized_data['salesman_user_id']
+        bot: Bot = request.META['bot']
 
-        sale_temporary_code = get_sale_temporary_code(code)
-        salesman = get_shop_salesman(
-            user_id=salesman_user_id,
-            shop_group_id=sale_temporary_code.group_id,
-        )
-        shop_sale = create_shop_sale_by_code(
-            salesman=salesman,
-            sale_temporary_code=sale_temporary_code,
-        )
+        shop = bot.shop
+
+        code: str = serialized_data['code']
+        employee_user_id: int = serialized_data['employee_user_id']
+
+        sale_code = get_sale_code(code)
+        employee = get_shop_employee(user_id=employee_user_id, shop_id=shop.id)
+        sale = create_shop_sale_by_code(employee=employee, sale_code=sale_code)
 
         shop_client_statistics = get_shop_client_statistics(
-            shop_client=sale_temporary_code.client,
-            shop_group=sale_temporary_code.group,
+            shop_client=sale_code.client,
+            shop=sale_code.shop,
         )
 
-        serializer = self.OutputSerializer(shop_sale)
         response_data = {
             'ok': True,
-            'result': serializer.data | {
-                'shop_group_bot_id': shop_client_statistics.shop_group_bot_id,
-                'each_nth_cup_free': shop_client_statistics.each_nth_cup_free,
-                'purchases_count': shop_client_statistics.purchases_count,
+            'result': {
+                'id': sale.id,
+                'is_free': sale.is_free,
+                'client_id': sale.client_id,
+                'client_user_id': sale.client.user_id,
+                'total_purchases_count': shop_client_statistics.total_purchases_count,
                 'current_cups_count': shop_client_statistics.current_cups_count,
             },
         }

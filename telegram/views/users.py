@@ -3,26 +3,19 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shops.selectors import get_shop_group_by_bot_id
 from shops.services.shop_clients import get_or_create_shop_client
-from telegram.selectors import get_user_role, get_user_by_id
+from telegram.authentication import BotAuthentication
+from telegram.models import Bot
+from telegram.permissions import HasBot
+from telegram.selectors import get_user_by_id, get_user_role
 from telegram.services.users import upsert_user
 
-__all__ = ('UserRetrieveCreateUpdateApi',)
+__all__ = ('UserRetrieveApi', 'UserCreateUpdateApi')
 
 
-class UserRetrieveCreateUpdateApi(APIView):
-
-    class InputRetrieveSerializer(serializers.Serializer):
-        user_id = serializers.IntegerField()
-        bot_id = serializers.IntegerField()
-
-    class InputCreateUpdateSerializer(serializers.Serializer):
-        id = serializers.IntegerField()
-        first_name = serializers.CharField()
-        last_name = serializers.CharField(allow_null=True)
-        username = serializers.CharField(allow_null=True)
-        bot_id = serializers.IntegerField()
+class UserRetrieveApi(APIView):
+    authentication_classes = [BotAuthentication]
+    permission_classes = [HasBot]
 
     class OutputSerializer(serializers.Serializer):
         id = serializers.IntegerField()
@@ -31,18 +24,10 @@ class UserRetrieveCreateUpdateApi(APIView):
         username = serializers.CharField(allow_null=True)
         created_at = serializers.DateTimeField()
 
-    def get(self, request: Request) -> Response:
-        serializer = self.InputRetrieveSerializer(data=request.query_params)
-        serializer.is_valid(raise_exception=True)
-        serialized_data = serializer.data
-
-        user_id: int = serialized_data['user_id']
-        bot_id: int = serialized_data['bot_id']
-
-        shop_group = get_shop_group_by_bot_id(bot_id)
-
+    def get(self, request: Request, user_id: int) -> Response:
+        bot: Bot = request.META['bot']
         user = get_user_by_id(user_id)
-        role = get_user_role(user_id=user_id, shop_group_id=shop_group.id)
+        role = get_user_role(user_id=user_id, shop_id=bot.shop.id)
 
         serializer = self.OutputSerializer(user)
         response_data = {
@@ -51,14 +36,30 @@ class UserRetrieveCreateUpdateApi(APIView):
         }
         return Response(response_data)
 
+
+class UserCreateUpdateApi(APIView):
+    authentication_classes = [BotAuthentication]
+    permission_classes = [HasBot]
+
+    class InputCreateUpdateSerializer(serializers.Serializer):
+        id = serializers.IntegerField()
+        first_name = serializers.CharField()
+        last_name = serializers.CharField(allow_null=True)
+        username = serializers.CharField(allow_null=True)
+
+    class OutputSerializer(serializers.Serializer):
+        id = serializers.IntegerField()
+        first_name = serializers.CharField()
+        last_name = serializers.CharField(allow_null=True)
+        username = serializers.CharField(allow_null=True)
+        created_at = serializers.DateTimeField()
+
     def post(self, request: Request):
         serializer = self.InputCreateUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serialized_data = serializer.data
 
-        bot_id: int = serialized_data['bot_id']
-
-        shop_group = get_shop_group_by_bot_id(bot_id)
+        bot: Bot = request.META['bot']
 
         user, is_created = upsert_user(
             id_=serialized_data['id'],
@@ -66,8 +67,8 @@ class UserRetrieveCreateUpdateApi(APIView):
             last_name=serialized_data['last_name'],
             username=serialized_data['username'],
         )
-        get_or_create_shop_client(user_id=user.id, shop_group_id=shop_group.id)
-        role = get_user_role(user_id=user.id, shop_group_id=shop_group.id)
+        get_or_create_shop_client(user_id=user.id, shop_id=bot.shop.id)
+        role = get_user_role(user_id=user.id, shop_id=bot.shop.id)
 
         serializer = self.OutputSerializer(user)
         status_code = (

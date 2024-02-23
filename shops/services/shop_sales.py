@@ -2,25 +2,16 @@ from django.db import transaction
 from django.utils import timezone
 
 from shops.exceptions import (
-    ShopSaleDeleteTimeExpiredError,
-    SalesmanAndSaleCodeShopGroupsNotEqualError,
-    SaleTemporaryCodeExpiredError,
-    UserIsNotShopClientError, ClientAlreadyHasGiftError,
+    ClientAlreadyHasGiftError, SaleTemporaryCodeExpiredError,
+    SalesmanAndSaleCodeShopGroupsNotEqualError, ShopSaleDeleteTimeExpiredError,
 )
-from shops.models import (
-    ShopSale,
-    ShopSalesman,
-    SaleTemporaryCode,
-    ShopGroup,
-    ShopClient,
-)
+from shops.models import (SaleCode, Shop, ShopClient, ShopEmployee, ShopSale)
 from shops.selectors import count_client_purchases_in_shop_group
-from telegram.selectors import get_user_role
 
 __all__ = (
     'delete_shop_sale',
     'create_shop_sale_by_code',
-    'is_shop_sale_free',
+    'will_be_given_gift',
     'create_shop_sale_by_user_id',
 )
 
@@ -32,80 +23,79 @@ def delete_shop_sale(shop_sale: ShopSale) -> None:
     shop_sale.delete()
 
 
-def is_shop_sale_free(
+def will_be_given_gift(
         *,
-        shop_group: ShopGroup,
+        shop: Shop,
         client_id: int | type[int],
 ) -> bool:
     sales_count = count_client_purchases_in_shop_group(
         client_id=client_id,
-        shop_group_id=shop_group.id,
+        shop_id=shop.id,
     )
-    has_any_purchase = sales_count != 0
-    current_cups_count = (sales_count + 1) % shop_group.each_nth_cup_free
+    total_purchases_count = sales_count['total_purchases_count']
+    has_any_purchase = total_purchases_count != 0
+    current_cups_count = (total_purchases_count + 1) % shop.each_nth_sale_free
     return current_cups_count == 0 and has_any_purchase
 
 
 def create_shop_sale_by_code(
         *,
-        salesman: ShopSalesman,
-        sale_temporary_code: SaleTemporaryCode,
+        employee: ShopEmployee,
+        sale_code: SaleCode,
 ) -> ShopSale:
-    if sale_temporary_code.client.has_gift:
+    if sale_code.client.has_gift:
         raise ClientAlreadyHasGiftError({
-            'client_user_id': sale_temporary_code.client.user_id,
+            'client_user_id': sale_code.client.user_id,
         })
 
-    if salesman.shop.group_id != sale_temporary_code.group_id:
+    if employee.shop_id != sale_code.shop_id:
         raise SalesmanAndSaleCodeShopGroupsNotEqualError({
-            'salesman_user_id': salesman.user_id,
-            'code': sale_temporary_code.code,
+            'employee_user_id': employee.user_id,
+            'code': sale_code.code,
         })
 
-    if sale_temporary_code.is_expired:
-        raise SaleTemporaryCodeExpiredError({'code': sale_temporary_code.code})
+    if sale_code.is_expired:
+        raise SaleTemporaryCodeExpiredError({'code': sale_code.code})
 
-    is_free = is_shop_sale_free(
-        shop_group=salesman.shop.group,
-        client_id=sale_temporary_code.client_id,
+    is_free = will_be_given_gift(
+        shop=employee.shop,
+        client_id=sale_code.client_id,
     )
 
     with transaction.atomic():
         if is_free:
-            sale_temporary_code.client.has_gift = True
-            sale_temporary_code.client.save()
+            sale_code.client.has_gift = True
+            sale_code.client.save()
         shop_sale = ShopSale.objects.create(
-            shop=salesman.shop,
-            client_id=sale_temporary_code.client_id,
-            salesman=salesman,
+            shop=employee.shop,
+            client_id=sale_code.client_id,
+            employee=employee,
             is_free=is_free,
         )
-        sale_temporary_code.delete()
+        sale_code.delete()
 
     return shop_sale
 
 
 def create_shop_sale_by_user_id(
         *,
-        shop_client: ShopClient,
-        shop_salesman: ShopSalesman,
+        client: ShopClient,
+        employee: ShopEmployee,
 ) -> ShopSale:
-    if shop_client.has_gift:
-        raise ClientAlreadyHasGiftError({
-            'client_user_id': shop_client.user_id,
-        })
+    if client.has_gift:
+        raise ClientAlreadyHasGiftError({'client_user_id': client.user_id})
 
-    is_free = is_shop_sale_free(
-        shop_group=shop_salesman.shop.group,
-        client_id=shop_client.id,
+    is_free = will_be_given_gift(
+        shop=client.shop,
+        client_id=client.id,
     )
     if is_free:
-        shop_client.has_gift = True
-        shop_client.save()
+        client.has_gift = True
+        client.save()
 
     return ShopSale.objects.create(
-        shop=shop_salesman.shop,
-        client=shop_client,
-        salesman=shop_salesman,
+        shop=client.shop,
+        client=client,
+        employee=employee,
         is_free=is_free,
     )

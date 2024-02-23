@@ -3,58 +3,22 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shops.selectors import (
-    get_shop_client_by_user_id,
-    get_shop_group_by_bot_id,
-)
+from shops.permissions import HasShop
+from shops.selectors import get_shop_client
 from shops.services.shop_clients import (
     get_shop_client_statistics,
-    get_shop_client_statistics_list
+    get_shop_client_statistics_list,
 )
+from telegram.authentication import BotAuthentication
+from telegram.models import Bot
+from telegram.permissions import HasBot
 
-__all__ = ('ShopClientStatisticsRetrieveApi', 'ShopClientStatisticsListApi')
-
-
-class ShopClientStatisticsRetrieveApi(APIView):
-
-    class InputSerializer(serializers.Serializer):
-        user_id = serializers.IntegerField()
-        bot_id = serializers.IntegerField()
-
-    class OutputSerializer(serializers.Serializer):
-        user_id = serializers.IntegerField()
-        has_gift = serializers.BooleanField()
-        shop_group_bot_id = serializers.IntegerField()
-        each_nth_cup_free = serializers.IntegerField()
-        purchases_count = serializers.IntegerField()
-        current_cups_count = serializers.IntegerField()
-
-    def get(self, request: Request) -> Response:
-        serializer = self.InputSerializer(data=request.query_params)
-        serializer.is_valid(raise_exception=True)
-        serialized_data = serializer.data
-
-        user_id: int = serialized_data['user_id']
-        bot_id: int = serialized_data['bot_id']
-
-        shop_client = get_shop_client_by_user_id(user_id, bot_id)
-        shop_group = get_shop_group_by_bot_id(bot_id)
-
-        shop_client_statistics = get_shop_client_statistics(
-            shop_client=shop_client,
-            shop_group=shop_group,
-        )
-
-        serializer = self.OutputSerializer(shop_client_statistics)
-
-        response_data = {'ok': True, 'result': serializer.data}
-        return Response(response_data)
+__all__ = ('ShopClientRetrieveApi', 'ShopClientListApi')
 
 
-class ShopClientStatisticsListApi(APIView):
-
-    class InputSerializer(serializers.Serializer):
-        bot_id = serializers.IntegerField()
+class ShopClientRetrieveApi(APIView):
+    authentication_classes = [BotAuthentication]
+    permission_classes = [HasBot, HasShop]
 
     class OutputSerializer(serializers.Serializer):
         class UserSerializer(serializers.Serializer):
@@ -63,20 +27,56 @@ class ShopClientStatisticsListApi(APIView):
             last_name = serializers.CharField(allow_null=True)
             username = serializers.CharField(allow_null=True)
 
+        id = serializers.IntegerField(source='client_id')
         user = UserSerializer()
-        shop_group_bot_id = serializers.IntegerField()
-        each_nth_cup_free = serializers.IntegerField()
-        purchases_count = serializers.IntegerField()
+        total_purchases_count = serializers.IntegerField()
+        free_purchases_count = serializers.IntegerField()
         current_cups_count = serializers.IntegerField()
+        has_gift = serializers.BooleanField()
+
+    def get(self, request: Request, user_id: int) -> Response:
+        bot: Bot = request.META['bot']
+
+        shop_client = get_shop_client(user_id=user_id, shop_id=bot.shop.id)
+
+        shop_client_statistics = get_shop_client_statistics(
+            shop_client=shop_client,
+            shop=bot.shop,
+        )
+
+        serializer = self.OutputSerializer(shop_client_statistics)
+
+        response_data = {'ok': True, 'result': serializer.data}
+        return Response(response_data)
+
+
+class ShopClientListApi(APIView):
+    authentication_classes = [BotAuthentication]
+    permission_classes = [HasBot, HasShop]
+
+    class OutputSerializer(serializers.Serializer):
+        class UserSerializer(serializers.Serializer):
+            id = serializers.IntegerField()
+            first_name = serializers.CharField()
+            last_name = serializers.CharField(allow_null=True)
+            username = serializers.CharField(allow_null=True)
+
+        id = serializers.IntegerField(source='client_id')
+        user = UserSerializer()
+        total_purchases_count = serializers.IntegerField()
+        free_purchases_count = serializers.IntegerField()
+        current_cups_count = serializers.IntegerField()
+        has_gift = serializers.BooleanField()
 
     def get(self, request: Request) -> Response:
-        serializer = self.InputSerializer(data=request.query_params)
-        serializer.is_valid(raise_exception=True)
-        serialized_data = serializer.data
+        bot: Bot = request.META['bot']
+        shop = bot.shop
 
-        bot_id: int = serialized_data['bot_id']
+        clients_statistics = get_shop_client_statistics_list(shop)
 
-        clients_statistics = get_shop_client_statistics_list(bot_id)
-
-        response_data = {'ok': True, 'result': clients_statistics}
+        serializer = self.OutputSerializer(clients_statistics, many=True)
+        response_data = {
+            'ok': True,
+            'result': serializer.data,
+        }
         return Response(response_data)

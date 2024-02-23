@@ -1,23 +1,22 @@
-from typing import Literal
-
 from core.exceptions import ObjectDoesNotExistError
-from shops.selectors import is_shop_admin, is_shop_salesman
-from telegram.models import User
+from shops.selectors import get_shop_employee
+from telegram.models import User, UserRole
 
 __all__ = ('get_user_role', 'get_user_by_id')
 
 
 def get_user_role(
         user_id: int | type[int],
-        shop_group_id: int | type[int],
-) -> Literal['client', 'salesman', 'admin']:
-    if is_shop_admin(user_id=user_id, shop_group_id=shop_group_id):
-        return 'admin'
-
-    if is_shop_salesman(user_id=user_id, shop_group_id=shop_group_id):
-        return 'salesman'
-
-    return 'client'
+        shop_id: int | type[int],
+) -> UserRole:
+    try:
+        employee = get_shop_employee(
+            user_id=user_id,
+            shop_id=shop_id,
+        )
+    except ObjectDoesNotExistError:
+        return UserRole.CLIENT
+    return UserRole.ADMIN if employee.is_admin else UserRole.SALESMAN
 
 
 def get_user_by_id(user_id: int) -> User:
