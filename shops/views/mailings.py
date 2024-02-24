@@ -1,8 +1,11 @@
+import json
+
 from rest_framework import serializers, status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from shops.permissions import HasShop
 from shops.tasks import start_mailing
 from telegram.authentication import BotAuthentication
 from telegram.models import Bot
@@ -11,12 +14,17 @@ from telegram.permissions import HasBot
 
 class MailingCreateApi(APIView):
     authentication_classes = [BotAuthentication]
-    permission_classes = [HasBot]
+    permission_classes = [HasBot, HasShop]
 
     class InputSerializer(serializers.Serializer):
-        text = serializers.CharField()
+
+        class ButtonSerializer(serializers.Serializer):
+            text = serializers.CharField(max_length=64)
+            url = serializers.URLField()
+
+        text = serializers.CharField(max_length=4096)
         admin_user_id = serializers.IntegerField()
-        bot_id = serializers.IntegerField()
+        buttons = ButtonSerializer(many=True, allow_empty=True)
 
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
@@ -27,8 +35,14 @@ class MailingCreateApi(APIView):
 
         admin_user_id = serialized_data['admin_user_id']
         text = serialized_data['text']
+        buttons = serialized_data['buttons']
 
-        start_mailing.delay(admin_user_id, bot.shop.id, text)
+        start_mailing.delay(
+            admin_user_id,
+            bot.shop.id,
+            text,
+            json.dumps(buttons, ensure_ascii=False),
+        )
 
         response_data = {'ok': True}
         return Response(response_data, status=status.HTTP_202_ACCEPTED)
