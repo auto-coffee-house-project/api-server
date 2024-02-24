@@ -1,9 +1,11 @@
 from django.db import transaction
 from django.utils import timezone
 
+from core.exceptions import ObjectDoesNotExistError
 from shops.exceptions import (
-    ClientAlreadyHasGiftError, SaleTemporaryCodeExpiredError,
-    SalesmanAndSaleCodeShopGroupsNotEqualError, ShopSaleDeleteTimeExpiredError,
+    ClientAlreadyHasGiftError,
+    SaleCodeExpiredError,
+    ShopSaleDeleteTimeExpiredError, UserIsEmployeeError,
 )
 from shops.models import (SaleCode, Shop, ShopClient, ShopEmployee, ShopSale)
 from shops.selectors import count_client_purchases_in_shop_group
@@ -43,19 +45,28 @@ def create_shop_sale_by_code(
         employee: ShopEmployee,
         sale_code: SaleCode,
 ) -> ShopSale:
+    if employee.user_id == sale_code.client.user_id:
+        raise UserIsEmployeeError({
+            'shop_id': employee.shop_id,
+            'user_id': employee.user_id,
+        })
+
+    if employee.shop_id != sale_code.shop_id:
+        raise ObjectDoesNotExistError({
+            'shop_id': sale_code.shop_id,
+            'code': sale_code.code,
+        })
+
     if sale_code.client.has_gift:
         raise ClientAlreadyHasGiftError({
             'client_user_id': sale_code.client.user_id,
         })
 
-    if employee.shop_id != sale_code.shop_id:
-        raise SalesmanAndSaleCodeShopGroupsNotEqualError({
-            'employee_user_id': employee.user_id,
+    if sale_code.is_expired:
+        raise SaleCodeExpiredError({
+            'shop_id': sale_code.shop_id,
             'code': sale_code.code,
         })
-
-    if sale_code.is_expired:
-        raise SaleTemporaryCodeExpiredError({'code': sale_code.code})
 
     is_free = will_be_given_gift(
         shop=employee.shop,
@@ -82,6 +93,12 @@ def create_shop_sale_by_user_id(
         client: ShopClient,
         employee: ShopEmployee,
 ) -> ShopSale:
+    if employee.user_id == client.user_id:
+        raise UserIsEmployeeError({
+            'shop_id': employee.shop_id,
+            'user_id': employee.user_id,
+        })
+
     if client.has_gift:
         raise ClientAlreadyHasGiftError({'client_user_id': client.user_id})
 
