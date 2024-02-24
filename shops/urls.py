@@ -76,7 +76,7 @@ clients_urlpatterns = [
         name='client-list',
     ),
     path(
-        r'user-ids/<int:user_id>/',
+        r'users/<int:user_id>/',
         ShopClientRetrieveApi.as_view(),
         name='client-retrieve',
     ),
