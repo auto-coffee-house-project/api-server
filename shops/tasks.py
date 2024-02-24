@@ -9,7 +9,7 @@ from telegram.services.bots import send_messages
 
 
 @shared_task
-def remove_expired_tasks() -> None:
+def remove_expired_sale_codes() -> None:
     get_expired_sale_codes().delete()
 
 
