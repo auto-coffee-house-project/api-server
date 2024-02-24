@@ -1,11 +1,12 @@
 from celery import shared_task
 
-from shops.models import ShopSale
 from shops.selectors import (
+    get_expired_employee_invitations,
     get_expired_sale_codes,
-    get_shop_employee, get_expired_employee_invitations,
+    get_shop_client_user_ids,
 )
-from telegram.services.bots import send_messages
+from shops.selectors.shops import get_shop_by_id
+from telegram.services.bots import build_keyboard_markup, send_messages
 
 
 @shared_task
@@ -19,18 +20,19 @@ def remove_expired_invitations() -> None:
 
 
 @shared_task
-def start_mailing(admin_user_id: int, shop_id: int, text: str) -> None:
-    shop_admin = get_shop_employee(
-        user_id=admin_user_id,
-        shop_group_id=shop_group_id,
-    )
+def start_mailing(
+        shop_id: int,
+        text: str,
+        buttons_json: str,
+) -> None:
+    keyboard_markup = build_keyboard_markup(buttons_json)
 
-    shop_user_ids = (
-        ShopSale
-        .objects
-        .filter(shop=shop_admin.shop)
-        .distinct('client__user_id')
-        .values_list('client__user_id', flat=True)
-    )
+    shop = get_shop_by_id(shop_id)
+    user_ids = get_shop_client_user_ids(shop_id)
 
-    send_messages(shop_admin.shop.group.bot.token, shop_user_ids, text)
+    send_messages(
+        token=shop.bot.token,
+        chat_ids=user_ids,
+        text=text,
+        reply_markup=keyboard_markup,
+    )
