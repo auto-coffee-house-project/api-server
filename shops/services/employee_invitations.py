@@ -9,10 +9,7 @@ __all__ = ('create_employee_invitation', 'build_invitation_url')
 def create_employee_invitation(employee: ShopEmployee) -> EmployeeInvitation:
     if not employee.is_admin:
         raise UserIsNotAdminError({'user_id': employee.user_id})
-    return EmployeeInvitation.objects.create(
-        shop_id=employee.shop_id,
-        created_by=employee,
-    )
+    return EmployeeInvitation.objects.create(shop_id=employee.shop_id)
 
 
 def build_invitation_url(

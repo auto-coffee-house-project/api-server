@@ -14,12 +14,11 @@ __all__ = ('EmployeeInvitation',)
 class EmployeeInvitation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     shop = models.ForeignKey(to=Shop, on_delete=models.CASCADE)
-    created_by = models.ForeignKey(to=ShopEmployee, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'invitation'
-        verbose_name_plural = 'invitations'
+        verbose_name = 'employee invitation'
+        verbose_name_plural = 'employee invitations'
 
     @property
     def expires_at(self) -> datetime:
