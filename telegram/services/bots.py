@@ -22,7 +22,7 @@ class Bot(TypedDict):
 
 def build_keyboard_markup(buttons_json: str) -> KeyboardMarkup:
     buttons: list[Button] = json.loads(buttons_json)
-    return {'inline_keyboard': [[button]] for button in buttons}
+    return {'inline_keyboard': [[button] for button in buttons]}
 
 
 @contextlib.contextmanager

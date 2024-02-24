@@ -23,8 +23,7 @@ class MailingCreateApi(APIView):
             url = serializers.URLField()
 
         text = serializers.CharField(max_length=4096)
-        admin_user_id = serializers.IntegerField()
-        buttons = ButtonSerializer(many=True, allow_empty=True)
+        buttons = ButtonSerializer(many=True)
 
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
@@ -33,12 +32,10 @@ class MailingCreateApi(APIView):
 
         bot: Bot = request.META['bot']
 
-        admin_user_id = serialized_data['admin_user_id']
         text = serialized_data['text']
         buttons = serialized_data['buttons']
 
         start_mailing.delay(
-            admin_user_id,
             bot.shop.id,
             text,
             json.dumps(buttons, ensure_ascii=False),
