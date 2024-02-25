@@ -1,11 +1,12 @@
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 __all__ = ('Button', 'KeyboardMarkup')
 
 
 class Button(TypedDict):
     text: str
-    url: str
+    url: NotRequired[str]
+    callback_data: NotRequired[str]
 
 
 class KeyboardMarkup(TypedDict):

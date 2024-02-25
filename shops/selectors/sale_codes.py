@@ -13,15 +13,18 @@ __all__ = (
 )
 
 
-def get_sale_code(code: str) -> SaleCode:
+def get_sale_code(*, shop_id: int, code: str) -> SaleCode:
     try:
         return (
             SaleCode.objects
             .select_related('client', 'client__user', 'shop')
-            .get(code=code)
+            .get(shop_id=shop_id, code=code)
         )
     except SaleCode.DoesNotExist:
-        raise ObjectDoesNotExistError({'code': code})
+        raise ObjectDoesNotExistError({
+            'shop_id': shop_id,
+            'code': code,
+        })
 
 
 def get_expired_sale_codes() -> QuerySet[SaleCode]:

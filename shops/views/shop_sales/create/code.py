@@ -34,9 +34,12 @@ class ShopSaleCreateByCodeApi(APIView):
         code: str = serialized_data['code']
         employee_user_id: int = serialized_data['employee_user_id']
 
-        sale_code = get_sale_code(code)
+        sale_code = get_sale_code(shop_id=shop.id, code=code)
         employee = get_shop_employee(user_id=employee_user_id, shop_id=shop.id)
-        sale = create_shop_sale_by_code(employee=employee, sale_code=sale_code)
+        sale = create_shop_sale_by_code(
+            employee=employee,
+            sale_code=sale_code,
+        )
 
         shop_client_statistics = get_shop_client_statistics(
             shop_client=sale_code.client,
