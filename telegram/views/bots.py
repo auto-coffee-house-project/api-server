@@ -33,7 +33,6 @@ class BotRetrieveUpdateApi(APIView):
 
     class InputUpdateSerializer(serializers.Serializer):
         start_text = serializers.CharField(max_length=1024)
-        start_text_client_web_app = serializers.CharField(max_length=1024)
 
     class OutputSerializer(serializers.Serializer):
         id = serializers.IntegerField()

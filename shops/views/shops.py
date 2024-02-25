@@ -45,7 +45,7 @@ class ShopRetrieveUpdateApi(APIView):
     class InputUpdateSerializer(serializers.Serializer):
         gift_name = serializers.CharField(max_length=64)
         start_text = serializers.CharField(max_length=4096)
-        each_nth_cup_free = serializers.IntegerField()
+        each_nth_sale_free = serializers.IntegerField()
         is_menu_shown = serializers.BooleanField()
 
     class OutputSerializer(serializers.Serializer):
@@ -75,7 +75,7 @@ class ShopRetrieveUpdateApi(APIView):
 
         shop = bot.shop
         shop.gift_name = serialized_data['gift_name']
-        shop.each_nth_sale_free = serialized_data['each_nth_cup_free']
+        shop.each_nth_sale_free = serialized_data['each_nth_sale_free']
         shop.start_text = serialized_data['start_text']
         shop.is_menu_shown = serialized_data['is_menu_shown']
         shop.save()
