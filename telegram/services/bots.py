@@ -7,14 +7,20 @@ from typing import NewType, TypedDict
 import httpx
 
 from telegram.exceptions import TelegramBotApiError
-from telegram.models import Button, KeyboardMarkup
+from telegram.models import Bot, Button, KeyboardMarkup
 
-__all__ = ('get_telegram_bot', 'send_messages', 'build_keyboard_markup')
+__all__ = (
+    'get_telegram_bot',
+    'send_messages',
+    'build_keyboard_markup',
+    'send_sale_created_messages',
+    'update_bot',
+)
 
 TelegramApiHttpClient = NewType('HttpClient', httpx.Client)
 
 
-class Bot(TypedDict):
+class BotDict(TypedDict):
     id: int
     first_name: str
     username: str
@@ -46,7 +52,7 @@ class TelegramBotApiConnection:
 
     def send_message(
             self,
-            chat_id: int,
+            chat_id: int | type[int],
             text: str,
             parse_mode: str | None = None,
             reply_markup: KeyboardMarkup | None = None,
@@ -63,7 +69,7 @@ class TelegramBotApiConnection:
         self.__http_client.post(url, json=request_data)
 
 
-def get_telegram_bot(token: str) -> Bot:
+def get_telegram_bot(token: str) -> BotDict:
     with closing_telegram_bot_api_http_client(token) as http_client:
         telegram_bot_api_connection = TelegramBotApiConnection(http_client)
         me = telegram_bot_api_connection.get_me()
@@ -94,3 +100,68 @@ def send_messages(
                 reply_markup=reply_markup,
             )
             time.sleep(0.3)
+
+
+def build_sale_created_keyboard_markup(sale_id: int) -> KeyboardMarkup:
+    return {
+        'inline_keyboard': [
+            [
+                {
+                    'text': '🔙 Отменить продажу',
+                    'callback_data': f'sale-delete:{sale_id}'
+                }
+            ],
+        ],
+    }
+
+
+def send_sale_created_messages(
+        *,
+        bot: Bot,
+        client_user_id: int | type[int],
+        employee_user_id: int | type[int],
+        is_gift_given: bool,
+        sale_id: int,
+        purchases_until_gift: int,
+) -> None:
+    if is_gift_given:
+        text_to_client = bot.gift_given_text
+        text_to_employee = (
+            '✅ Код успешно применен!\n'
+            '🎉 Клиент получил подарок!'
+        )
+        reply_markup_to_employee = build_sale_created_keyboard_markup(sale_id)
+    else:
+        text_to_client = bot.sale_created_text.format(
+            count=purchases_until_gift,
+        )
+        text_to_employee = '✅ Код успешно применен!'
+        reply_markup_to_employee = build_sale_created_keyboard_markup(sale_id)
+
+    with closing_telegram_bot_api_http_client(bot.token) as http_client:
+        telegram_bot_api = TelegramBotApiConnection(http_client)
+
+        telegram_bot_api.send_message(
+            chat_id=employee_user_id,
+            text=text_to_employee,
+            reply_markup=reply_markup_to_employee,
+        )
+        telegram_bot_api.send_message(
+            chat_id=client_user_id,
+            text=text_to_client,
+        )
+
+
+def update_bot(
+        bot: Bot,
+        *,
+        start_text: str,
+        sale_created_text: str,
+        gift_given_text: str,
+) -> None:
+    bot.start_text = start_text
+    bot.sale_created_text = sale_created_text
+    bot.gift_given_text = gift_given_text
+
+    bot.full_clean()
+    bot.save()
