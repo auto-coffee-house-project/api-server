@@ -19,6 +19,7 @@ django-celery-beat = "^2.5.0"
 redis = "^5.0.1"
 psycopg2-binary = "^2.9.9"
 pillow = "^10.2.0"
+sentry-sdk = {extras = ["django"], version = "^1.40.5"}
 
 
 [tool.poetry.group.dev.dependencies]
