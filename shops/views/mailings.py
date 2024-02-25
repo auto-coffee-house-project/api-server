@@ -24,6 +24,7 @@ class MailingCreateApi(APIView):
 
         text = serializers.CharField(max_length=4096)
         buttons = ButtonSerializer(many=True)
+        is_markdown = serializers.BooleanField()
 
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
@@ -34,10 +35,14 @@ class MailingCreateApi(APIView):
 
         text = serialized_data['text']
         buttons = serialized_data['buttons']
+        is_markdown = serialized_data['is_markdown']
+
+        parse_mode = 'Markdown' if is_markdown else None
 
         start_mailing.delay(
             bot.shop.id,
             text,
+            parse_mode,
             json.dumps(buttons, ensure_ascii=False),
         )
 

@@ -23,6 +23,7 @@ def remove_expired_invitations() -> None:
 def start_mailing(
         shop_id: int,
         text: str,
+        parse_mode: str,
         buttons_json: str,
 ) -> None:
     keyboard_markup = build_keyboard_markup(buttons_json)
@@ -34,5 +35,6 @@ def start_mailing(
         token=shop.bot.token,
         chat_ids=user_ids,
         text=text,
+        parse_mode=parse_mode,
         reply_markup=keyboard_markup,
     )

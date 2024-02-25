@@ -48,14 +48,16 @@ class TelegramBotApiConnection:
             self,
             chat_id: int,
             text: str,
+            parse_mode: str | None = None,
             reply_markup: KeyboardMarkup | None = None,
     ):
         url = '/sendMessage'
         request_data = {
             'chat_id': chat_id,
             'text': text,
-            'parse_mode': 'MarkdownV2',
         }
+        if parse_mode:
+            request_data['parse_mode'] = parse_mode
         if reply_markup:
             request_data['reply_markup'] = reply_markup
         self.__http_client.post(url, json=request_data)
@@ -78,6 +80,7 @@ def send_messages(
         token: str,
         chat_ids: Iterable[int],
         text: str,
+        parse_mode: str,
         reply_markup: KeyboardMarkup,
 ) -> None:
     with closing_telegram_bot_api_http_client(token) as http_client:
@@ -87,6 +90,7 @@ def send_messages(
             telegram_bot_api_connection.send_message(
                 chat_id=chat_id,
                 text=text,
+                parse_mode=parse_mode,
                 reply_markup=reply_markup,
             )
             time.sleep(0.3)
