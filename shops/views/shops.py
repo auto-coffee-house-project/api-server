@@ -59,10 +59,7 @@ class ShopRetrieveUpdateApi(APIView):
         gift_photo: str | None = request.data['gift_photo']
 
         if gift_photo is not None:
-            shop.gift_photo = base64_to_in_memory_uploaded_file(
-                base64_string=gift_photo,
-                field_name='gift_photo',
-            )
+            shop.gift_photo = base64_to_in_memory_uploaded_file(gift_photo)
 
         shop.gift_name = serialized_data['gift_name']
         shop.each_nth_sale_free = serialized_data['each_nth_sale_free']

@@ -16,7 +16,6 @@ def parse_base64_string(base64_string: str) -> tuple[str, bytes]:
 
 def base64_to_in_memory_uploaded_file(
         base64_string: str,
-        field_name: str,
 ) -> InMemoryUploadedFile:
     content_type, content = parse_base64_string(base64_string)
 
@@ -27,7 +26,7 @@ def base64_to_in_memory_uploaded_file(
 
     return InMemoryUploadedFile(
         file=bytes_io,
-        field_name=field_name,
+        field_name=None,
         name=file_name,
         content_type=content_type,
         size=sys.getsizeof(bytes_io),
