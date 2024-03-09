@@ -14,7 +14,6 @@ from shops.views import (
 )
 from shops.views.shop_products import (
     ShopProductListCreateApi,
-    ShopProductPhotoUpdateApi,
     ShopProductRetrieveUpdateDeleteApi,
 )
 
@@ -37,11 +36,6 @@ sales_urlpatterns = [
 ]
 
 products_urlpatterns = [
-    path(
-        r'<int:product_id>/photos/',
-        ShopProductPhotoUpdateApi.as_view(),
-        name='product-photo-update',
-    ),
     path(
         r'<int:product_id>/',
         ShopProductRetrieveUpdateDeleteApi.as_view(),

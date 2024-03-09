@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from decimal import Decimal
 
-from django.core.files.uploadedfile import UploadedFile
+from django.core.files.uploadedfile import InMemoryUploadedFile, UploadedFile
 from django.db import transaction
 
 from shops.models import ShopProduct, ShopProductCategory
@@ -17,6 +17,7 @@ __all__ = (
 def create_shop_product(
         *,
         name: str,
+        photo: InMemoryUploadedFile | None,
         price: Decimal,
         shop_id: int | type[int],
         category_names: Iterable[str],
@@ -25,6 +26,7 @@ def create_shop_product(
 
     product = ShopProduct.objects.create(
         name=name,
+        photo=photo,
         price=price,
         shop_id=shop_id,
     )
@@ -54,11 +56,13 @@ def update_shop_product(
         *,
         product: ShopProduct,
         name: str,
+        photo: UploadedFile | None,
         price: Decimal,
         category_names: Iterable[str],
 ) -> ShopProduct:
     category_names = set(category_names)
 
+    product.photo = photo
     product.name = name
     product.price = price
     product.save()

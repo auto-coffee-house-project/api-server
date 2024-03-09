@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from django.db import models
 
 from shops.models.shop_product_categories import ShopProductCategory
@@ -9,8 +7,6 @@ __all__ = ('ShopProduct',)
 
 
 def get_shop_product_photo_path(instance: 'ShopProduct', filename: str) -> str:
-    file_extension = filename.split('.')[-1].lower()
-    filename = f'{uuid4().hex}.{file_extension}'
     return f'{instance.shop_id}/{filename}'
 
 
