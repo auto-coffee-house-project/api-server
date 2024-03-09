@@ -41,10 +41,7 @@ class ShopSaleCreateByCodeApi(APIView):
             sale_code=sale_code,
         )
 
-        shop_client_statistics = get_shop_client_statistics(
-            shop_client=sale_code.client,
-            shop=sale_code.shop,
-        )
+        shop_client_statistics = get_shop_client_statistics(sale_code.client)
 
         response_data = {
             'ok': True,

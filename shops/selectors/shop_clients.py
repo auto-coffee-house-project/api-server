@@ -8,7 +8,7 @@ def get_shop_client(user_id: int, shop_id: int) -> ShopClient:
     try:
         return (
             ShopClient.objects
-            .select_related('user')
+            .select_related('user', 'shop')
             .get(user_id=user_id, shop_id=shop_id)
         )
     except ShopClient.DoesNotExist:

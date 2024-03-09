@@ -33,20 +33,48 @@ class ShopClientRetrieveApi(APIView):
         free_purchases_count = serializers.IntegerField()
         current_cups_count = serializers.IntegerField()
         has_gift = serializers.BooleanField()
+        born_on = serializers.DateField()
+
+    class InputUpdateSerializer(serializers.Serializer):
+        born_on = serializers.DateField(required=False, allow_null=True)
+        has_gift = serializers.BooleanField(required=False)
 
     def get(self, request: Request, user_id: int) -> Response:
         bot: Bot = request.META['bot']
 
         shop_client = get_shop_client(user_id=user_id, shop_id=bot.shop.id)
 
-        shop_client_statistics = get_shop_client_statistics(
-            shop_client=shop_client,
-            shop=bot.shop,
-        )
+        shop_client_statistics = get_shop_client_statistics(shop_client)
 
         serializer = self.OutputSerializer(shop_client_statistics)
 
         response_data = {'ok': True, 'result': serializer.data}
+        return Response(response_data)
+
+    def patch(self, request: Request, user_id: int) -> Response:
+        serializer = self.InputUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serialized_data = serializer.data
+
+        bot: Bot = request.META['bot']
+
+        client = get_shop_client(user_id=user_id, shop_id=bot.shop.id)
+
+        if 'born_on' in serialized_data:
+            client.born_on = serialized_data['born_on']
+
+        if 'has_gift' in serialized_data:
+            client.has_gift = serialized_data['has_gift']
+
+        client.save()
+
+        client_statistics = get_shop_client_statistics(client)
+
+        serializer = self.OutputSerializer(client_statistics)
+        response_data = {
+            'ok': True,
+            'result': serializer.data,
+        }
         return Response(response_data)
 
 
@@ -67,6 +95,7 @@ class ShopClientListApi(APIView):
         free_purchases_count = serializers.IntegerField()
         current_cups_count = serializers.IntegerField()
         has_gift = serializers.BooleanField()
+        born_on = serializers.DateField()
 
     def get(self, request: Request) -> Response:
         bot: Bot = request.META['bot']

@@ -37,10 +37,8 @@ def get_or_create_shop_client(
     )
 
 
-def get_shop_client_statistics(
-        shop_client: ShopClient,
-        shop: Shop,
-) -> ShopClientStatistics:
+def get_shop_client_statistics(shop_client: ShopClient) -> ShopClientStatistics:
+    shop = shop_client.shop
     client_purchases = count_client_purchases_in_shop_group(
         client_id=shop_client.id,
         shop_id=shop.id,
@@ -62,6 +60,7 @@ def get_shop_client_statistics(
         total_purchases_count=total_purchases_count,
         free_purchases_count=free_purchases_count,
         current_cups_count=current_cups_count,
+        born_on=shop_client.born_on,
     )
 
 
@@ -96,7 +95,7 @@ def get_shop_client_statistics_list(
         .select_related('user')
         .filter(shop_id=shop.id)
         .values('id', 'user_id', 'user__first_name', 'user__last_name',
-                'user__username', 'has_gift')
+                'user__username', 'has_gift', 'born_on')
     )
     clients_purchases_statistics = get_clients_purchases_statistics(shop.id)
     client_id_to_purchases_statistics = {
@@ -126,6 +125,7 @@ def get_shop_client_statistics_list(
                 total_purchases_count=total_purchases_count,
                 free_purchases_count=free_purchases_count,
                 current_cups_count=current_cups_count,
+                born_on=client['born_on'],
             )
         )
 

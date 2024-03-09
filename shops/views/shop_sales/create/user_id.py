@@ -38,10 +38,7 @@ class ShopSaleCreateByUserIdApi(APIView):
         employee = get_shop_employee(user_id=employee_user_id, shop_id=shop.id)
 
         sale = create_shop_sale_by_user_id(client=client, employee=employee)
-        client_statistics = get_shop_client_statistics(
-            shop_client=client,
-            shop=shop,
-        )
+        client_statistics = get_shop_client_statistics(client)
 
         response_data = {
             'ok': True,
