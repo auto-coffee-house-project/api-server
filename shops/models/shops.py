@@ -8,8 +8,6 @@ __all__ = ('Shop',)
 
 
 def get_gift_photo_path(instance: 'Shop', filename: str) -> str:
-    file_extension = filename.split('.')[-1].lower()
-    filename = f'{uuid4().hex}.{file_extension}'
     return f'{instance.id}/{filename}'
 
 
