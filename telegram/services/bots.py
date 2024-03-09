@@ -1,7 +1,7 @@
 import contextlib
+import io
 import json
-import time
-from collections.abc import Generator, Iterable
+from collections.abc import Generator
 from typing import NewType, TypedDict
 
 import httpx
@@ -11,10 +11,10 @@ from telegram.models import Bot, Button, KeyboardMarkup
 
 __all__ = (
     'get_telegram_bot',
-    'send_messages',
     'build_keyboard_markup',
     'send_sale_created_messages',
     'update_bot',
+    'TelegramBotApiConnection',
 )
 
 TelegramApiHttpClient = NewType('HttpClient', httpx.Client)
@@ -68,6 +68,47 @@ class TelegramBotApiConnection:
             request_data['reply_markup'] = reply_markup
         self.__http_client.post(url, json=request_data)
 
+    def send_photo_via_file_id_or_url(
+            self,
+            photo: str,
+            chat_id: int,
+            caption: str | None,
+            parse_mode: str,
+            reply_markup: KeyboardMarkup,
+    ):
+        url = '/sendPhoto'
+        request_data = {
+            'chat_id': chat_id,
+            'photo': photo,
+        }
+        if caption:
+            request_data['caption'] = caption
+        if parse_mode:
+            request_data['parse_mode'] = parse_mode
+        if reply_markup:
+            request_data['reply_markup'] = reply_markup
+        return self.__http_client.post(url, json=request_data)
+
+    def send_photo_io(
+            self,
+            photo: io.BytesIO,
+            chat_id: int,
+            caption: str | None,
+            parse_mode: str,
+            reply_markup: KeyboardMarkup,
+    ):
+        url = '/sendPhoto'
+        request_files = {'photo': photo}
+        request_data = {'chat_id': chat_id, }
+        if caption:
+            request_data['caption'] = caption
+        if parse_mode:
+            request_data['parse_mode'] = parse_mode
+        if reply_markup:
+            request_data['reply_markup'] = json.dumps(reply_markup)
+        return self.__http_client.post(url, data=request_data,
+                                       files=request_files)
+
 
 def get_telegram_bot(token: str) -> BotDict:
     with closing_telegram_bot_api_http_client(token) as http_client:
@@ -79,27 +120,6 @@ def get_telegram_bot(token: str) -> BotDict:
         raise TelegramBotApiError(error_description)
 
     return me['result']
-
-
-def send_messages(
-        *,
-        token: str,
-        chat_ids: Iterable[int],
-        text: str,
-        parse_mode: str,
-        reply_markup: KeyboardMarkup,
-) -> None:
-    with closing_telegram_bot_api_http_client(token) as http_client:
-        telegram_bot_api_connection = TelegramBotApiConnection(http_client)
-
-        for chat_id in chat_ids:
-            telegram_bot_api_connection.send_message(
-                chat_id=chat_id,
-                text=text,
-                parse_mode=parse_mode,
-                reply_markup=reply_markup,
-            )
-            time.sleep(0.3)
 
 
 def build_sale_created_keyboard_markup(sale_id: int) -> KeyboardMarkup:
