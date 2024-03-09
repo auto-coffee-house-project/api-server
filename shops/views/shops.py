@@ -1,41 +1,16 @@
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from core.services import base64_to_in_memory_uploaded_file
 from shops.permissions import HasShop
 from telegram.authentication import BotAuthentication
 from telegram.models import Bot
 from telegram.permissions import HasBot
 
-__all__ = ('ShopRetrieveUpdateApi', 'ShopGiftPhotoUpdateApi')
-
-
-class ShopGiftPhotoUpdateApi(APIView):
-    authentication_classes = [BotAuthentication]
-    permission_classes = [HasBot, HasShop]
-
-    class OutputSerializer(serializers.Serializer):
-        id = serializers.IntegerField()
-        gift_photo = serializers.ImageField()
-
-    def post(self, request: Request) -> Response:
-        bot: Bot = request.META['bot']
-        photo: InMemoryUploadedFile | None = request.data.get('photo')
-
-        if photo is None:
-            raise ValidationError({'photo': 'This field is required'})
-
-        shop = bot.shop
-
-        shop.gift_photo = photo
-        shop.save()
-
-        serializer = self.OutputSerializer(shop)
-        response_data = {'ok': True, 'result': serializer.data}
-        return Response(response_data)
+__all__ = ('ShopRetrieveUpdateApi',)
 
 
 class ShopRetrieveUpdateApi(APIView):
@@ -44,6 +19,11 @@ class ShopRetrieveUpdateApi(APIView):
 
     class InputUpdateSerializer(serializers.Serializer):
         gift_name = serializers.CharField(max_length=64)
+        gift_photo = Base64ImageField(
+            allow_null=True,
+            represent_in_base64=True,
+            default=None,
+        )
         start_text = serializers.CharField(max_length=4096)
         each_nth_sale_free = serializers.IntegerField()
         is_menu_shown = serializers.BooleanField()
@@ -74,6 +54,16 @@ class ShopRetrieveUpdateApi(APIView):
         bot: Bot = request.META['bot']
 
         shop = bot.shop
+
+        # serialized_data['gift_photo'] does not contain content type
+        gift_photo: str | None = request.data['gift_photo']
+
+        if gift_photo is not None:
+            shop.gift_photo = base64_to_in_memory_uploaded_file(
+                base64_string=gift_photo,
+                field_name='gift_photo',
+            )
+
         shop.gift_name = serialized_data['gift_name']
         shop.each_nth_sale_free = serialized_data['each_nth_sale_free']
         shop.start_text = serialized_data['start_text']

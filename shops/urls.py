@@ -7,7 +7,6 @@ from shops.views import (
     ShopClientRetrieveApi,
     ShopEmployeeDeleteApi,
     ShopEmployeeListCreateApi,
-    ShopGiftPhotoUpdateApi,
     ShopRetrieveUpdateApi,
     ShopSaleCreateByCodeApi,
     ShopSaleCreateByUserIdApi,
@@ -81,24 +80,16 @@ clients_urlpatterns = [
     ),
 ]
 
-shops_patterns = [
-    path(
-        r'gift-photos/',
-        ShopGiftPhotoUpdateApi.as_view(),
-    ),
-    path(
-        r'',
-        ShopRetrieveUpdateApi.as_view(),
-        name='group-retrieve',
-    ),
-]
-
 urlpatterns = [
     path(r'clients/', include(clients_urlpatterns)),
     path(r'products/', include(products_urlpatterns)),
     path(r'employees/', include(employees_urlpatterns)),
     path(r'sales/', include(sales_urlpatterns)),
-    path(r'me/', include(shops_patterns)),
+    path(
+        r'me/',
+        ShopRetrieveUpdateApi.as_view(),
+        name='group-retrieve',
+    ),
     path(
         r'sale-codes/',
         SaleCodeCreateApi.as_view(),
