@@ -1,3 +1,6 @@
+import base64
+import io
+import sys
 from decimal import Decimal
 
 from django.core.files.uploadedfile import InMemoryUploadedFile

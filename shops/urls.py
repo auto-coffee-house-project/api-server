@@ -2,7 +2,6 @@ from django.urls import include, path
 
 from shops.views import (
     EmployeeInvitationCreateApi,
-    MailingCreateApi,
     SaleCodeCreateApi,
     ShopClientListApi,
     ShopClientRetrieveApi,
@@ -109,10 +108,5 @@ urlpatterns = [
         r'invitations/',
         EmployeeInvitationCreateApi.as_view(),
         name='invitation-create',
-    ),
-    path(
-        r'mailings/',
-        MailingCreateApi.as_view(),
-        name='mailing-create',
     ),
 ]
