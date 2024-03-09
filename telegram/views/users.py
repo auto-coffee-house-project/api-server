@@ -3,6 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from shops.permissions import HasShop
 from shops.services.shop_clients import get_or_create_shop_client
 from telegram.authentication import BotAuthentication
 from telegram.models import Bot
@@ -15,7 +16,7 @@ __all__ = ('UserRetrieveApi', 'UserCreateUpdateApi')
 
 class UserRetrieveApi(APIView):
     authentication_classes = [BotAuthentication]
-    permission_classes = [HasBot]
+    permission_classes = [HasBot, HasShop]
 
     class OutputSerializer(serializers.Serializer):
         id = serializers.IntegerField()
@@ -39,7 +40,7 @@ class UserRetrieveApi(APIView):
 
 class UserCreateUpdateApi(APIView):
     authentication_classes = [BotAuthentication]
-    permission_classes = [HasBot]
+    permission_classes = [HasBot, HasShop]
 
     class InputCreateUpdateSerializer(serializers.Serializer):
         id = serializers.IntegerField()
