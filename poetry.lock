@@ -386,6 +386,26 @@ django = ">=3.0"
 pytz = "*"
 
 [[package]]
+name = "drf-extra-fields"
+version = "3.7.0"
+description = "Additional fields for Django Rest Framework."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "drf-extra-fields-3.7.0.tar.gz", hash = "sha256:d7e58b8f60432233328b8a64831e50ea5d05932d3cb63ade8fe66c0d3d21ac5b"},
+    {file = "drf_extra_fields-3.7.0-py3-none-any.whl", hash = "sha256:3f3b1a6ec0eea02c9cabd62fe10e1673e1e42c5daa27fa9d4cea758c52c5cc30"},
+]
+
+[package.dependencies]
+Django = ">=2.2"
+djangorestframework = ">=3.9.2"
+filetype = ">=1.2.0"
+
+[package.extras]
+base64imagefield = ["Pillow (>=6.2.1)"]
+
+[[package]]
 name = "et-xmlfile"
 version = "1.1.0"
 description = "An implementation of lxml.xmlfile for the standard library"
@@ -430,6 +450,18 @@ files = [
 
 [package.dependencies]
 python-dateutil = ">=2.4"
+
+[[package]]
+name = "filetype"
+version = "1.2.0"
+description = "Infer file type and MIME type of any file/buffer. No external dependencies."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "filetype-1.2.0-py2.py3-none-any.whl", hash = "sha256:7ce71b6880181241cf7ac8697a2f1eb6a8bd9b429f7ad6d27b8db9ba5f1c2d25"},
+    {file = "filetype-1.2.0.tar.gz", hash = "sha256:66b56cd6474bf41d8c54660347d37afcc3f7d1970648de365c102ef77548aadb"},
+]
 
 [[package]]
 name = "h11"
@@ -955,19 +987,19 @@ ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"
 
 [[package]]
 name = "sentry-sdk"
-version = "1.40.5"
+version = "1.41.0"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "sentry-sdk-1.40.5.tar.gz", hash = "sha256:d2dca2392cc5c9a2cc9bb874dd7978ebb759682fe4fe889ee7e970ee8dd1c61e"},
-    {file = "sentry_sdk-1.40.5-py2.py3-none-any.whl", hash = "sha256:d188b407c9bacbe2a50a824e1f8fb99ee1aeb309133310488c570cb6d7056643"},
+    {file = "sentry-sdk-1.41.0.tar.gz", hash = "sha256:4f2d6c43c07925d8cd10dfbd0970ea7cb784f70e79523cca9dbcd72df38e5a46"},
+    {file = "sentry_sdk-1.41.0-py2.py3-none-any.whl", hash = "sha256:be4f8f4b29a80b6a3b71f0f31487beb9e296391da20af8504498a328befed53f"},
 ]
 
 [package.dependencies]
+celery = {version = ">=3", optional = true, markers = "extra == \"celery\""}
 certifi = "*"
-django = {version = ">=1.8", optional = true, markers = "extra == \"django\""}
 urllib3 = {version = ">=1.26.11", markers = "python_version >= \"3.6\""}
 
 [package.extras]
@@ -1157,4 +1189,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "caf041113cb9e1e85491c87632af042c187c8da51288181393cf23a338b1ca32"
+content-hash = "18fd127196a2f451d1065b434dd6df4cfb956d0b9a4740d27377f1984509cda5"
