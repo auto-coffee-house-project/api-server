@@ -8,12 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = Env()
 env.read_env(env_file=BASE_DIR / '.env')
 
-sentry_sdk.init(
-    dsn=env.str('SENTRY_DSN'),
-    traces_sample_rate=env.float('SENTRY_TRACES_SAMPLE_RATE'),
-    profiles_sample_rate=env.float('SENTRY_PROFILES_SAMPLE_RATE'),
-)
-
 SECRET_KEY = env.str('SECRET_KEY')
 
 DEBUG = env.bool('DEBUG')
@@ -52,6 +46,7 @@ INSTALLED_APPS = [
     'core',
     'shops',
     'telegram',
+    'mailing',
 ]
 
 MIDDLEWARE = [
