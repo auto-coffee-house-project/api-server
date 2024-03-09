@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import date
 
 from django.db import models
 
@@ -25,11 +26,13 @@ class ShopClientStatistics:
     total_purchases_count: int
     free_purchases_count: int
     current_cups_count: int
+    born_on: date
 
 
 class ShopClient(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     shop = models.ForeignKey(to=Shop, on_delete=models.CASCADE)
+    born_on = models.DateField(null=True, blank=True)
     has_gift = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
