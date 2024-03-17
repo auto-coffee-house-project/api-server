@@ -1,7 +1,10 @@
 from celery import shared_task
 
 from mailing.services import send_messages, send_photos
-from shops.selectors import get_shop_client_user_ids
+from shops.selectors import (
+    get_segregated_shop_client_user_ids,
+    get_shop_client_user_ids,
+)
 from shops.selectors.shops import get_shop_by_id
 from telegram.services.bots import (
     TelegramBotApiConnection,
@@ -18,11 +21,20 @@ def create_mailing(
         parse_mode: str,
         buttons_json: str,
         base64_photo: str | None,
+        last_n_days_count: int | None,
+        required_purchases_count: int | None,
 ):
     shop = get_shop_by_id(shop_id)
     keyboard_markup = build_keyboard_markup(buttons_json)
 
-    chat_ids = get_shop_client_user_ids(shop.id)
+    if last_n_days_count is not None and required_purchases_count is not None:
+        chat_ids = get_segregated_shop_client_user_ids(
+            shop_id=shop.id,
+            last_n_days_count=last_n_days_count,
+            required_purchases_count=required_purchases_count,
+        )
+    else:
+        chat_ids = get_shop_client_user_ids(shop.id)
 
     with closing_telegram_bot_api_http_client(shop.bot.token) as http_client:
         telegram_bot_api_connection = TelegramBotApiConnection(http_client)

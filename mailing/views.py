@@ -25,7 +25,7 @@ class MailingCreateApi(APIView):
             url = serializers.URLField()
 
         text = serializers.CharField(max_length=4096)
-        buttons = ButtonSerializer(many=True)
+        buttons = ButtonSerializer(many=True, default=list)
         parse_mode = serializers.ChoiceField(
             choices=['HTML', 'Markdown'],
             allow_null=True,
@@ -35,6 +35,20 @@ class MailingCreateApi(APIView):
             represent_in_base64=True,
             allow_null=True,
             default=None,
+        )
+        last_n_days_count = serializers.IntegerField(
+            min_value=1,
+            max_value=1000,
+            default=None,
+            allow_null=None,
+            required=False,
+        )
+        required_purchases_count = serializers.IntegerField(
+            min_value=1,
+            max_value=1000,
+            default=None,
+            allow_null=None,
+            required=False,
         )
 
     def post(self, request: Request) -> Response:
@@ -48,6 +62,10 @@ class MailingCreateApi(APIView):
         buttons: list[Button] = serialized_data['buttons']
         parse_mode: str = serialized_data['parse_mode']
         base64_photo: str | None = serialized_data['photo']
+        last_n_days_count: int | None = serialized_data['last_n_days_count']
+        required_purchases_count: int | None = (
+            serialized_data['required_purchases_count']
+        )
 
         create_mailing.delay(
             shop_id=bot.shop.id,
@@ -55,6 +73,8 @@ class MailingCreateApi(APIView):
             buttons_json=json.dumps(buttons),
             parse_mode=parse_mode,
             base64_photo=base64_photo,
+            last_n_days_count=last_n_days_count,
+            required_purchases_count=required_purchases_count,
         )
 
         return Response({'ok': True}, status=status.HTTP_202_ACCEPTED)
