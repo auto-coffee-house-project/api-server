@@ -13,6 +13,7 @@ __all__ = (
     'get_telegram_bot',
     'build_keyboard_markup',
     'send_sale_created_messages',
+    'send_gift_code_activated_messages',
     'update_bot',
     'TelegramBotApiConnection',
 )
@@ -133,6 +134,31 @@ def build_sale_created_keyboard_markup(sale_id: int) -> KeyboardMarkup:
             ],
         ],
     }
+
+
+def send_gift_code_activated_messages(
+        *,
+        bot: Bot,
+        client_user_id: int | type[int],
+        employee_user_id: int | type[int],
+) -> None:
+    with closing_telegram_bot_api_http_client(bot.token) as http_client:
+        telegram_bot_api = TelegramBotApiConnection(http_client)
+
+        telegram_bot_api.send_message(
+            chat_id=employee_user_id,
+            text=(
+                '✅ Код успешно активирован.'
+                ' Клиент может получить свой подарок!'
+            ),
+        )
+        telegram_bot_api.send_message(
+            chat_id=client_user_id,
+            text=(
+                f'✅ Код успешно активирован.'
+                f' Можете забрать свой подарок!'
+            ),
+        )
 
 
 def send_sale_created_messages(
