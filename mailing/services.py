@@ -1,9 +1,19 @@
 import base64
 import io
+import json
+import logging
 from collections.abc import Iterable
 
+from shops.models import Shop
+from shops.selectors import get_shop_client_user_ids
+from shops.selectors.shops import get_shop_by_id
 from telegram.models import KeyboardMarkup
-from telegram.services.bots import TelegramBotApiConnection
+from telegram.services.bots import (
+    TelegramBotApiConnection,
+    build_keyboard_markup, closing_telegram_bot_api_http_client,
+)
+
+logger = logging.getLogger(__name__)
 
 
 def parse_base64_photo(base64_photo: str) -> bytes:
@@ -105,3 +115,44 @@ def send_messages(
             parse_mode=parse_mode,
             reply_markup=reply_markup,
         )
+
+
+def start_mailing(
+        shop: Shop,
+        buttons_json: str,
+        segregation_options_json: str,
+        text: str,
+        base64_photo: str | None,
+        parse_mode: str | None,
+) -> None:
+    keyboard_markup = build_keyboard_markup(buttons_json)
+
+    segregation_options = json.loads(segregation_options_json)
+
+    logger.debug(
+        'Creating mail: segregation options',
+        extra={'segregation_options': segregation_options},
+    )
+
+    chat_ids = get_shop_client_user_ids(shop.id, segregation_options)
+
+    with closing_telegram_bot_api_http_client(shop.bot.token) as http_client:
+        telegram_bot_api_connection = TelegramBotApiConnection(http_client)
+
+        if base64_photo is not None:
+            send_photos(
+                chat_ids=chat_ids,
+                telegram_bot_api_connection=telegram_bot_api_connection,
+                base64_photo=base64_photo,
+                text=text,
+                parse_mode=parse_mode,
+                reply_markup=keyboard_markup,
+            )
+        else:
+            send_messages(
+                chat_ids=chat_ids,
+                telegram_bot_api_connection=telegram_bot_api_connection,
+                text=text,
+                parse_mode=parse_mode,
+                reply_markup=keyboard_markup,
+            )

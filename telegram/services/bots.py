@@ -16,6 +16,7 @@ __all__ = (
     'send_gift_code_activated_messages',
     'update_bot',
     'TelegramBotApiConnection',
+    'closing_telegram_bot_api_http_client',
 )
 
 TelegramApiHttpClient = NewType('HttpClient', httpx.Client)

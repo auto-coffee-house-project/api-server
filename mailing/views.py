@@ -6,7 +6,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from mailing.tasks import create_mailing
+from mailing.serializers import ButtonSerializer, SegregationOptionsSerializer
+from mailing.tasks import start_mailing_task
 from shops.permissions import HasShop
 from telegram.authentication import BotAuthentication
 from telegram.models import Bot, Button
@@ -20,14 +21,10 @@ class MailingCreateApi(APIView):
     permission_classes = [HasBot, HasShop]
 
     class InputSerializer(serializers.Serializer):
-        class ButtonSerializer(serializers.Serializer):
-            text = serializers.CharField(max_length=64)
-            url = serializers.URLField()
-
         text = serializers.CharField(max_length=4096)
         buttons = ButtonSerializer(many=True, default=list)
         parse_mode = serializers.ChoiceField(
-            choices=['HTML', 'Markdown'],
+            choices=['HTML', 'MarkdownV2'],
             allow_null=True,
             default=None,
         )
@@ -36,18 +33,8 @@ class MailingCreateApi(APIView):
             allow_null=True,
             default=None,
         )
-        last_n_days_count = serializers.IntegerField(
-            min_value=1,
-            max_value=1000,
-            default=None,
-            allow_null=None,
-            required=False,
-        )
-        required_purchases_count = serializers.IntegerField(
-            min_value=1,
-            max_value=1000,
-            default=None,
-            allow_null=None,
+        segregation_options = SegregationOptionsSerializer(
+            default=dict,
             required=False,
         )
 
@@ -60,21 +47,20 @@ class MailingCreateApi(APIView):
 
         text: str = serialized_data['text']
         buttons: list[Button] = serialized_data['buttons']
-        parse_mode: str = serialized_data['parse_mode']
+        parse_mode: str | None = serialized_data['parse_mode']
         base64_photo: str | None = serialized_data['photo']
-        last_n_days_count: int | None = serialized_data['last_n_days_count']
-        required_purchases_count: int | None = (
-            serialized_data['required_purchases_count']
-        )
+        segregation_options: dict = serialized_data['segregation_options']
 
-        create_mailing.delay(
+        start_mailing_task.delay(
             shop_id=bot.shop.id,
             text=text,
             buttons_json=json.dumps(buttons),
             parse_mode=parse_mode,
             base64_photo=base64_photo,
-            last_n_days_count=last_n_days_count,
-            required_purchases_count=required_purchases_count,
+            segregation_options_json=json.dumps(
+                segregation_options,
+                default=str,
+            ),
         )
 
         return Response({'ok': True}, status=status.HTTP_202_ACCEPTED)
