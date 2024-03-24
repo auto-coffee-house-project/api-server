@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'shops',
     'telegram',
     'mailing',
+    'gifts',
 ]
 
 MIDDLEWARE = [
