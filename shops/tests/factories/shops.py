@@ -15,7 +15,7 @@ class ShopFactory(DjangoModelFactory):
     bot = SubFactory(BotFactory)
     gift_name = Faker('name')
     gift_photo = None
-    each_nth_cup_free = Faker('random_int', min=1, max=10)
+    each_nth_sale_free = Faker('random_int', min=1, max=10)
     is_menu_shown = Faker('boolean')
     subscription_starts_at = Faker('date')
     subscription_ends_at = Faker('date')

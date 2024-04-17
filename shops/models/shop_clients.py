@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 
 from django.db import models
 
@@ -19,10 +19,17 @@ class ClientUser:
 
 
 @dataclass(frozen=True, slots=True)
+class ShopClientGift:
+    code: str
+    is_main: bool
+    expires_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
 class ShopClientStatistics:
     client_id: int
     user: ClientUser
-    has_gift: bool
+    gifts: list[ShopClientGift]
     total_purchases_count: int
     free_purchases_count: int
     current_cups_count: int
@@ -33,7 +40,6 @@ class ShopClient(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     shop = models.ForeignKey(to=Shop, on_delete=models.CASCADE)
     born_on = models.DateField(null=True, blank=True)
-    has_gift = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

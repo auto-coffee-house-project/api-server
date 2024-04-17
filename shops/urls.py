@@ -11,26 +11,11 @@ from shops.views import (
     ShopSaleCreateByCodeApi,
     ShopSaleCreateByUserIdApi,
     ShopSaleDeleteApi,
-    GiftCodeCreateApi,
-    GiftCodeActivateApi,
 )
 from shops.views.shop_products import (
     ShopProductListCreateApi,
     ShopProductRetrieveUpdateDeleteApi,
 )
-
-gift_codes_urlpatterns = [
-    path(
-        r'',
-        GiftCodeCreateApi.as_view(),
-        name='gift-code-create',
-    ),
-    path(
-        r'activate/',
-        GiftCodeActivateApi.as_view(),
-        name='gift-code-activate',
-    )
-]
 
 sales_urlpatterns = [
     path(
@@ -108,9 +93,5 @@ urlpatterns = [
         r'invitations/',
         EmployeeInvitationCreateApi.as_view(),
         name='invitation-create',
-    ),
-    path(
-        r'gift-codes/',
-        include(gift_codes_urlpatterns),
     ),
 ]

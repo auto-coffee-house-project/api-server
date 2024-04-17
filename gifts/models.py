@@ -3,6 +3,7 @@ import string
 from uuid import uuid4
 
 from django.db import models
+from django.utils import timezone
 
 from shops.models.shop_clients import ShopClient
 from shops.models.shops import Shop
@@ -11,7 +12,7 @@ __all__ = ('Gift',)
 
 
 def generate_code() -> str:
-    return random.choices(string.digits, k=4)
+    return ''.join(random.choices(string.digits, k=4))
 
 
 class Gift(models.Model):
@@ -25,9 +26,14 @@ class Gift(models.Model):
         to=Shop,
         on_delete=models.CASCADE,
     )
+    is_main = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
 
     class Meta:
         db_table = 'gifts'
         unique_together = ('shop', 'code')
+
+    @property
+    def is_expired(self) -> bool:
+        return self.expires_at < timezone.now()

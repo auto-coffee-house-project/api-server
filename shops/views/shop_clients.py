@@ -21,6 +21,12 @@ class ShopClientRetrieveApi(APIView):
     permission_classes = [HasBot, HasShop]
 
     class OutputSerializer(serializers.Serializer):
+
+        class GiftSerializer(serializers.Serializer):
+            code = serializers.CharField()
+            is_main = serializers.BooleanField()
+            expires_at = serializers.DateTimeField()
+
         class UserSerializer(serializers.Serializer):
             id = serializers.IntegerField()
             first_name = serializers.CharField()
@@ -32,7 +38,7 @@ class ShopClientRetrieveApi(APIView):
         total_purchases_count = serializers.IntegerField()
         free_purchases_count = serializers.IntegerField()
         current_cups_count = serializers.IntegerField()
-        has_gift = serializers.BooleanField()
+        gifts = GiftSerializer(many=True)
         born_on = serializers.DateField()
 
     class InputUpdateSerializer(serializers.Serializer):
@@ -94,7 +100,6 @@ class ShopClientListApi(APIView):
         total_purchases_count = serializers.IntegerField()
         free_purchases_count = serializers.IntegerField()
         current_cups_count = serializers.IntegerField()
-        has_gift = serializers.BooleanField()
         born_on = serializers.DateField()
 
     def get(self, request: Request) -> Response:

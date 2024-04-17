@@ -9,6 +9,7 @@ from shops.models import (
     ShopClientStatistics,
     ShopSale,
 )
+from shops.models.shop_clients import ShopClientGift
 from shops.selectors import count_client_purchases_in_shop_group
 
 __all__ = (
@@ -46,6 +47,8 @@ def get_shop_client_statistics(shop_client: ShopClient) -> ShopClientStatistics:
     total_purchases_count = client_purchases['total_purchases_count']
     free_purchases_count = client_purchases['free_purchases_count']
 
+    gifts = shop_client.gift_set.all()
+
     current_cups_count = total_purchases_count % shop.each_nth_sale_free
 
     return ShopClientStatistics(
@@ -56,7 +59,13 @@ def get_shop_client_statistics(shop_client: ShopClient) -> ShopClientStatistics:
             last_name=shop_client.user.last_name,
             username=shop_client.user.username,
         ),
-        has_gift=shop_client.has_gift,
+        gifts=[
+            ShopClientGift(
+                code=gift.code,
+                is_main=gift.is_main,
+                expires_at=gift.expires_at,
+            ) for gift in gifts
+        ],
         total_purchases_count=total_purchases_count,
         free_purchases_count=free_purchases_count,
         current_cups_count=current_cups_count,
@@ -95,7 +104,7 @@ def get_shop_client_statistics_list(
         .select_related('user')
         .filter(shop_id=shop.id)
         .values('id', 'user_id', 'user__first_name', 'user__last_name',
-                'user__username', 'has_gift', 'born_on')
+                'user__username', 'born_on')
     )
     clients_purchases_statistics = get_clients_purchases_statistics(shop.id)
     client_id_to_purchases_statistics = {
@@ -121,7 +130,7 @@ def get_shop_client_statistics_list(
                     last_name=client['user__last_name'],
                     username=client['user__username'],
                 ),
-                has_gift=client['has_gift'],
+                gifts=[],  # TODO use other model to drop this field
                 total_purchases_count=total_purchases_count,
                 free_purchases_count=free_purchases_count,
                 current_cups_count=current_cups_count,

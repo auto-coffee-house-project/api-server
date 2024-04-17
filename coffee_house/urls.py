@@ -7,4 +7,5 @@ urlpatterns = [
     path('api/shops/', include('shops.urls')),
     path('api/telegram/', include('telegram.urls')),
     path('api/mailing/', include('mailing.urls')),
+    path('api/gifts/', include('gifts.urls')),
 ]

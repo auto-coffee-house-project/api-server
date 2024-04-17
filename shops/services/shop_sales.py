@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from django.db import transaction
 from django.utils import timezone
 
+from gifts.services import GiftCreateContext
 from shops.exceptions import (
-    ClientAlreadyHasGiftError,
     SaleCodeExpiredError,
     ShopSaleDeleteTimeExpiredError,
     UserIsEmployeeError,
@@ -37,14 +37,6 @@ def validate_user_is_not_employee(
         raise UserIsEmployeeError({
             'shop_id': employee.shop_id,
             'user_id': employee.user_id,
-        })
-
-
-def validate_client_has_no_gift(client: ShopClient) -> None:
-    if client.has_gift:
-        raise ClientAlreadyHasGiftError({
-            'user_id': client.user_id,
-            'shop_id': client.shop_id,
         })
 
 
@@ -108,7 +100,6 @@ def create_shop_sale(
         employee=employee,
         client_user_id=client.user_id,
     )
-    validate_client_has_no_gift(client)
 
     sales_count = count_client_purchases_in_shop_group(
         client_id=client.id,
@@ -130,8 +121,8 @@ def create_shop_sale(
     purchases_statistics.increment_total_purchases_count()
 
     if purchases_statistics.is_gift_given:
-        client.has_gift = True
-        client.save()
+        gift_context = GiftCreateContext(client=client, shop=shop)
+        gift_context.create_main_gift()
 
     send_sale_created_messages(
         bot=bot,

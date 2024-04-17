@@ -19,7 +19,7 @@ class ShopClientAdmin(ImportExportModelAdmin):
     search_fields = ('user__id', 'user__first_name', 'user__username')
     search_help_text = 'User ID, name or username'
     ordering = ('-created_at',)
-    list_display = ('user', 'shop', 'has_gift', 'created_at')
+    list_display = ('user', 'shop', 'created_at')
     list_select_related = ('user', 'shop')
-    list_filter = ('shop', 'has_gift')
+    list_filter = ('shop',)
     inlines = (SaleInline,)
