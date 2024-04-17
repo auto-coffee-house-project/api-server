@@ -1,4 +1,4 @@
-from typing import TypeAlias, TypedDict
+from typing import Any, TypeAlias, TypedDict
 
 from django.db.models import Case, Count, IntegerField, When
 
@@ -16,6 +16,7 @@ __all__ = (
     'get_or_create_shop_client',
     'get_shop_client_statistics',
     'get_shop_client_statistics_list',
+    'update_shop_client',
 )
 
 IsCreated: TypeAlias = bool
@@ -139,3 +140,13 @@ def get_shop_client_statistics_list(
         )
 
     return all_clients_statistics
+
+
+def update_shop_client(
+        shop_client: ShopClient,
+        fields: dict[str, Any]
+) -> ShopClient:
+    if 'born_on' in fields:
+        shop_client.born_on = fields['born_on']
+    shop_client.save()
+    return shop_client

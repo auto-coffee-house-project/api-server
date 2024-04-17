@@ -8,6 +8,7 @@ from shops.selectors import get_shop_client
 from shops.services.shop_clients import (
     get_shop_client_statistics,
     get_shop_client_statistics_list,
+    update_shop_client,
 )
 from telegram.authentication import BotAuthentication
 from telegram.models import Bot
@@ -21,7 +22,6 @@ class ShopClientRetrieveApi(APIView):
     permission_classes = [HasBot, HasShop]
 
     class OutputSerializer(serializers.Serializer):
-
         class GiftSerializer(serializers.Serializer):
             code = serializers.CharField()
             is_main = serializers.BooleanField()
@@ -65,15 +65,7 @@ class ShopClientRetrieveApi(APIView):
         bot: Bot = request.META['bot']
 
         client = get_shop_client(user_id=user_id, shop_id=bot.shop.id)
-
-        if 'born_on' in serialized_data:
-            client.born_on = serialized_data['born_on']
-
-        if 'has_gift' in serialized_data:
-            client.has_gift = serialized_data['has_gift']
-
-        client.save()
-
+        client = update_shop_client(shop_client=client, fields=serialized_data)
         client_statistics = get_shop_client_statistics(client)
 
         serializer = self.OutputSerializer(client_statistics)
