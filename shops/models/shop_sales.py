@@ -4,24 +4,18 @@ from django.conf import settings
 from django.db import models
 
 from shops.models.shop_clients import ShopClient
-from shops.models.shop_salesmans import ShopSalesman
+from shops.models.shop_employee import ShopEmployee
 from shops.models.shops import Shop
 
 __all__ = ('ShopSale',)
 
 
 class ShopSale(models.Model):
-    shop = models.ForeignKey(
-        to=Shop,
-        on_delete=models.CASCADE,
-    )
-    client = models.ForeignKey(
-        to=ShopClient,
-        on_delete=models.CASCADE,
-    )
+    shop = models.ForeignKey(to=Shop, on_delete=models.CASCADE)
+    client = models.ForeignKey(to=ShopClient, on_delete=models.CASCADE)
     is_free = models.BooleanField(default=False)
-    salesman = models.ForeignKey(
-        to=ShopSalesman,
+    employee = models.ForeignKey(
+        to=ShopEmployee,
         on_delete=models.SET_NULL,
         null=True,
         blank=True

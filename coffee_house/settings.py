@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import sentry_sdk
 from environ import Env
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,6 +15,18 @@ DEBUG = env.bool('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS')
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'bot-id',
+]
 
 CELERY_BROKER_URL = env.str('CELERY_BROKER_URL')
 
@@ -33,6 +46,8 @@ INSTALLED_APPS = [
     'core',
     'shops',
     'telegram',
+    'mailing',
+    'gifts',
 ]
 
 MIDDLEWARE = [
@@ -104,6 +119,13 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
+MEDIA_URL = 'media/'
+
+if DEBUG:
+    MEDIA_ROOT = BASE_DIR / 'media'
+else:
+    MEDIA_ROOT = Path(env.str('MEDIA_ROOT'))
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
@@ -118,6 +140,7 @@ REST_FRAMEWORK = {
 }
 
 SALE_TEMPORARY_CODE_LIFETIME_SECONDS = 120
+GIFT_CODE_LIFETIME_DAYS = 14
 
 SALE_CAN_BE_DELETED_IN_SECONDS = 60
 

@@ -1,16 +1,34 @@
+from uuid import uuid4
+
 from django.db import models
 
-from shops.models.shop_groups import ShopGroup
+from telegram.models.bots import Bot
 
 __all__ = ('Shop',)
 
 
+def get_gift_photo_path(instance: 'Shop', filename: str) -> str:
+    return f'{instance.id}/{filename}'
+
+
 class Shop(models.Model):
     name = models.CharField(max_length=255)
-    group = models.ForeignKey(
-        to=ShopGroup,
-        on_delete=models.CASCADE,
+    bot = models.OneToOneField(to=Bot, on_delete=models.CASCADE)
+    gift_name = models.CharField(max_length=64)
+    gift_photo = models.ImageField(
+        upload_to=get_gift_photo_path,
+        null=True,
+        blank=True,
     )
+    start_text = models.TextField(max_length=4096)
+    each_nth_sale_free = models.PositiveSmallIntegerField()
+    birthdays_offer_after_nth_sale = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+    )
+    is_menu_shown = models.BooleanField(default=False)
+    subscription_starts_at = models.DateTimeField()
+    subscription_ends_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

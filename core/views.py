@@ -1,3 +1,4 @@
+import kombu.exceptions
 from django.core import exceptions as django_exceptions
 from django.http import Http404
 from rest_framework import exceptions as drf_exceptions, status
@@ -7,7 +8,11 @@ from rest_framework.response import Response
 from rest_framework.serializers import as_serializer_error
 from rest_framework.views import exception_handler as drf_exception_handler
 
-from core.exceptions import ApplicationError, ObjectDoesNotExistError
+from core.exceptions import (
+    ApplicationError,
+    MessageBrokerConnectionError,
+    ObjectDoesNotExistError,
+)
 
 __all__ = ('exception_handler', 'ping_view')
 
@@ -24,6 +29,11 @@ def exception_handler(exc, context) -> Response | None:
         'extra': {}
     }
     """
+    if isinstance(exc, kombu.exceptions.OperationalError):
+        exc = MessageBrokerConnectionError({
+            'error': 'Could not connect to the message broker',
+        })
+
     if isinstance(exc, django_exceptions.ValidationError):
         exc = drf_exceptions.ValidationError(as_serializer_error(exc))
 

@@ -1,16 +1,20 @@
-from django.urls import path, include
+from django.urls import include, path
 
 from shops.views import (
-    ShopSaleCreateByUserIdApi,
+    EmployeeInvitationCreateApi,
+    SaleCodeCreateApi,
+    ShopClientListApi,
+    ShopClientRetrieveApi,
+    ShopEmployeeDeleteApi,
+    ShopEmployeeListCreateApi,
+    ShopRetrieveUpdateApi,
     ShopSaleCreateByCodeApi,
-    SaleTemporaryCodeCreateApi,
+    ShopSaleCreateByUserIdApi,
     ShopSaleDeleteApi,
-    ShopGroupRetrieveUpdateApi,
-    SalesmanInvitationCreateApi,
-    MailingCreateApi,
-    ShopSalesmanListCreateDeleteApi,
-    ShopClientStatisticsRetrieveApi,
-    ShopClientStatisticsListApi,
+)
+from shops.views.shop_products import (
+    ShopProductListCreateApi,
+    ShopProductRetrieveUpdateDeleteApi,
 )
 
 sales_urlpatterns = [
@@ -31,45 +35,63 @@ sales_urlpatterns = [
     ),
 ]
 
-clients_urlpatterns = [
+products_urlpatterns = [
     path(
-        r'statistics/',
-        ShopClientStatisticsRetrieveApi.as_view(),
-        name='client-statistics',
+        r'<int:product_id>/',
+        ShopProductRetrieveUpdateDeleteApi.as_view(),
+        name='product-retrieve-update-delete',
     ),
     path(
-        r'all-statistics/',
-        ShopClientStatisticsListApi.as_view(),
-        name='all-clients-statistics',
-    )
+        r'',
+        ShopProductListCreateApi.as_view(),
+        name='product-list-create',
+    ),
+]
+
+employees_urlpatterns = [
+    path(
+        r'',
+        ShopEmployeeListCreateApi.as_view(),
+        name='employee-list-create',
+    ),
+    path(
+        r'<int:employee_id>/',
+        ShopEmployeeDeleteApi.as_view(),
+        name='employee-delete',
+    ),
+]
+
+clients_urlpatterns = [
+    path(
+        r'',
+        ShopClientListApi.as_view(),
+        name='client-list',
+    ),
+    path(
+        r'users/<int:user_id>/',
+        ShopClientRetrieveApi.as_view(),
+        name='client-retrieve',
+    ),
 ]
 
 urlpatterns = [
     path(r'clients/', include(clients_urlpatterns)),
-    path(
-        r'salesmans/',
-        ShopSalesmanListCreateDeleteApi.as_view(),
-        name='salesman-list-create-delete',
-    ),
+    path(r'products/', include(products_urlpatterns)),
+    path(r'employees/', include(employees_urlpatterns)),
     path(r'sales/', include(sales_urlpatterns)),
     path(
-        r'codes/',
-        SaleTemporaryCodeCreateApi.as_view(),
-        name='sale-temporary-code-create',
-    ),
-    path(
-        r'groups/bots/<int:bot_id>/',
-        ShopGroupRetrieveUpdateApi.as_view(),
+        r'me/',
+        ShopRetrieveUpdateApi.as_view(),
         name='group-retrieve',
     ),
     path(
-        r'invitations/',
-        SalesmanInvitationCreateApi.as_view(),
-        name='invitation-create',
+        r'sale-codes/',
+        SaleCodeCreateApi.as_view(),
+        name='sale-code-create',
     ),
     path(
-        r'mailings/',
-        MailingCreateApi.as_view(),
-        name='mailing-create',
+        r'invitations/',
+        EmployeeInvitationCreateApi.as_view(),
+        name='invitation-create',
     ),
 ]

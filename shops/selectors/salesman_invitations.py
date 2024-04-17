@@ -6,27 +6,25 @@ from django.db.models import QuerySet
 from django.utils import timezone
 
 from core.exceptions import ObjectDoesNotExistError
-from shops.models import SalesmanInvitation
+from shops.models import EmployeeInvitation
 
-__all__ = ('get_salesman_invitation_by_id', 'get_expired_salesman_invitations')
+__all__ = ('get_employee_invitation', 'get_expired_employee_invitations')
 
 
-def get_salesman_invitation_by_id(
-        invitation_id: UUID,
-) -> SalesmanInvitation:
+def get_employee_invitation(invitation_id: UUID) -> EmployeeInvitation:
     try:
         return (
-            SalesmanInvitation.objects
-            .select_related('shop', 'shop__group')
+            EmployeeInvitation.objects
+            .select_related('shop')
             .get(id=invitation_id)
         )
-    except SalesmanInvitation.DoesNotExist:
+    except EmployeeInvitation.DoesNotExist:
         raise ObjectDoesNotExistError({'invitation_id': invitation_id})
 
 
-def get_expired_salesman_invitations() -> QuerySet[SalesmanInvitation]:
+def get_expired_employee_invitations() -> QuerySet[EmployeeInvitation]:
     now = timezone.now()
     expires_at = now - timedelta(
         seconds=settings.SALESMAN_INVITATION_LIFETIME_SECONDS,
     )
-    return SalesmanInvitation.objects.filter(created_at__lt=expires_at)
+    return EmployeeInvitation.objects.filter(created_at__lt=expires_at)
