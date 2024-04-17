@@ -22,6 +22,10 @@ class Shop(models.Model):
     )
     start_text = models.TextField(max_length=4096)
     each_nth_sale_free = models.PositiveSmallIntegerField()
+    birthdays_offer_after_nth_sale = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+    )
     is_menu_shown = models.BooleanField(default=False)
     subscription_starts_at = models.DateTimeField()
     subscription_ends_at = models.DateTimeField()
