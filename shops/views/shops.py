@@ -25,6 +25,10 @@ class ShopRetrieveUpdateApi(APIView):
         )
         start_text = serializers.CharField(max_length=4096, required=False)
         each_nth_sale_free = serializers.IntegerField(required=False)
+        birthdays_offer_after_nth_sale = serializers.IntegerField(
+            allow_null=True,
+            required=False,
+        )
         is_menu_shown = serializers.BooleanField(required=False)
 
     class OutputSerializer(serializers.Serializer):
@@ -34,6 +38,9 @@ class ShopRetrieveUpdateApi(APIView):
         gift_photo = serializers.ImageField(allow_null=True)
         start_text = serializers.CharField()
         each_nth_sale_free = serializers.IntegerField()
+        birthdays_offer_after_nth_sale = serializers.IntegerField(
+            allow_null=True,
+        )
         is_menu_shown = serializers.BooleanField()
         created_at = serializers.DateTimeField()
         subscription_starts_at = serializers.DateTimeField()
