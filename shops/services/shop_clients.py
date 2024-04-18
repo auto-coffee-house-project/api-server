@@ -1,7 +1,9 @@
 from typing import Any, TypeAlias, TypedDict
 
+from django.db import transaction
 from django.db.models import Case, Count, IntegerField, When
 
+from gifts.services import GiftCreateContext
 from shops.models import (
     ClientUser,
     Shop,
@@ -142,11 +144,19 @@ def get_shop_client_statistics_list(
     return all_clients_statistics
 
 
+@transaction.atomic
 def update_shop_client(
         shop_client: ShopClient,
         fields: dict[str, Any]
 ) -> ShopClient:
     if 'born_on' in fields:
+        if shop_client.born_on is None:
+            gift_create_context = GiftCreateContext(
+                client=shop_client,
+                shop=shop_client.shop,
+            )
+            gift_create_context.create_extra_gift()
+
         shop_client.born_on = fields['born_on']
     shop_client.save()
     return shop_client
