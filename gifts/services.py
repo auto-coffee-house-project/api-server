@@ -22,7 +22,7 @@ class GiftCreateContext:
     @property
     def expires_at(self) -> datetime:
         now = timezone.now()
-        return now + timedelta(seconds=settings.GIFT_CODE_LIFETIME_DAYS)
+        return now + timedelta(days=settings.GIFT_CODE_LIFETIME_DAYS)
 
     def create_main_gift(self) -> Gift:
         is_main_gift_exists = (
