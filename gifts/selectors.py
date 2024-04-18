@@ -1,7 +1,10 @@
-from shops.models import ShopClient
+from django.db.models import QuerySet
+from django.utils import timezone
 
-__all__ = ('has_main_gift',)
+from gifts.models import Gift
+
+__all__ = ('get_expired_gifts',)
 
 
-def has_main_gift(client: ShopClient) -> bool:
-    return client.gift_set.filter(is_main=True).exists()
+def get_expired_gifts() -> QuerySet[Gift]:
+    return Gift.objects.filter(expires_at__lt=timezone.now())
