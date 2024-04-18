@@ -4,10 +4,9 @@ from datetime import date, datetime
 from django.db import models
 
 from shops.models.shops import Shop
-
-__all__ = ('ShopClient', 'ClientUser', 'ShopClientStatistics')
-
 from telegram.models import User
+
+__all__ = ('ShopClient', 'ClientUser', 'ShopClientStatistics', 'ShopClientGift')
 
 
 @dataclass(frozen=True, slots=True)

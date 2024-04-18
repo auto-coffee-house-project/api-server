@@ -4,8 +4,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.services import base64_to_in_memory_uploaded_file
 from shops.permissions import HasShop
+from shops.services.shops import update_shop
 from telegram.authentication import BotAuthentication
 from telegram.models import Bot
 from telegram.permissions import HasBot
@@ -25,6 +25,10 @@ class ShopRetrieveUpdateApi(APIView):
         )
         start_text = serializers.CharField(max_length=4096, required=False)
         each_nth_sale_free = serializers.IntegerField(required=False)
+        birthdays_offer_after_nth_sale = serializers.IntegerField(
+            allow_null=True,
+            required=False,
+        )
         is_menu_shown = serializers.BooleanField(required=False)
 
     class OutputSerializer(serializers.Serializer):
@@ -34,6 +38,9 @@ class ShopRetrieveUpdateApi(APIView):
         gift_photo = serializers.ImageField(allow_null=True)
         start_text = serializers.CharField()
         each_nth_sale_free = serializers.IntegerField()
+        birthdays_offer_after_nth_sale = serializers.IntegerField(
+            allow_null=True,
+        )
         is_menu_shown = serializers.BooleanField()
         created_at = serializers.DateTimeField()
         subscription_starts_at = serializers.DateTimeField()
@@ -52,27 +59,10 @@ class ShopRetrieveUpdateApi(APIView):
 
         bot: Bot = request.META['bot']
 
-        shop = bot.shop
-
-        if 'gift_photo' in serialized_data:
-            gift_photo = base64_to_in_memory_uploaded_file(
-                request.data['gift_photo']
-            )
-            shop.gift_photo = gift_photo
-
-        if 'gift_name' in serialized_data:
-            shop.gift_name = serialized_data['gift_name']
-
-        if 'each_nth_sale_free' in serialized_data:
-            shop.each_nth_sale_free = serialized_data['each_nth_sale_free']
-
-        if 'start_text' in serialized_data:
-            shop.start_text = serialized_data['start_text']
-
-        if 'is_menu_shown' in serialized_data:
-            shop.is_menu_shown = serialized_data['is_menu_shown']
-
-        shop.save()
-
-        response_data = {'ok': True, 'result': self.OutputSerializer(shop).data}
-        return Response(response_data)
+        shop = update_shop(
+            shop=bot.shop,
+            fields=serialized_data,
+            request_raw_data=request.data,
+        )
+        serializer = self.OutputSerializer(shop)
+        return Response({'ok': True, 'result': serializer.data})
