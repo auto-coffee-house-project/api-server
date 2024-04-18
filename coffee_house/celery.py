@@ -17,4 +17,8 @@ app.conf.beat_schedule = {
         'task': 'shops.tasks.remove_expired_invitations',
         'schedule': 600,
     },
+    'remove-expired-employee-requests': {
+        'task': 'gifts.tasks.remove_expired_gifts',
+        'schedule': 600,
+    },
 }
