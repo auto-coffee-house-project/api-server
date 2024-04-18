@@ -62,7 +62,7 @@ class ShopRetrieveUpdateApi(APIView):
         shop = update_shop(
             shop=bot.shop,
             fields=serialized_data,
-            gift_photo_in_base64=request.data['gift_photo'],
+            request_raw_data=request.data,
         )
         serializer = self.OutputSerializer(shop)
         return Response({'ok': True, 'result': serializer.data})

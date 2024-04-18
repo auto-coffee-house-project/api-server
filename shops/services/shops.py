@@ -9,9 +9,10 @@ __all__ = ('update_shop',)
 def update_shop(
         shop: Shop,
         fields: dict[str, Any],
-        gift_photo_in_base64: str,
+        request_raw_data: dict[str, Any],
 ) -> Shop:
-    if 'gift_photo' in fields:
+    if 'gift_photo' in request_raw_data:
+        gift_photo_in_base64 = request_raw_data['gift_photo']
         gift_photo = base64_to_in_memory_uploaded_file(gift_photo_in_base64)
         shop.gift_photo = gift_photo
 
